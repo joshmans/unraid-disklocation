@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name             "disklocation">
 <!ENTITY author           "Ole-Henrik Jakobsen">
-<!ENTITY version          "2026.07.09">
+<!ENTITY version          "2026.08.21">
 <!ENTITY launch           "Tools/&name;">
 <!ENTITY branch           "master">
 <!ENTITY packageURL       "https://github.com/olehj/disklocation/archive/&branch;.zip">
@@ -45,6 +45,9 @@
 -->
 
 <CHANGES>
+###2026.08.21
+ - Commit #515 - MINOR: Adjusted dev_by_phy_path to include partitions that exists to include more drives to be physically attached in case non part-names does not exists.
+
 ###2026.07.09
  - Commit #513 - BUG: SMART+DB fatals when by-path is non-existing. Some systems do not have /dev/disk/by-path apparently, so the SMART+DB update would fail. Checking if the directory exists before checking the contents with dev_by_phy_path() function.
 
