@@ -87,6 +87,8 @@
 		$devices[$hash]["formatted"]["serial"] = ( isset($devices[$hash]["raw"]["serial"]) ? "" . substr($devices[$hash]["raw"]["serial"], $serial_trim) . "" : null );
 		$devices[$hash]["raw"]["manufacturer"] = $data["manufacturer"];
 		$devices[$hash]["formatted"]["manufacturer"] = $devices[$hash]["raw"]["manufacturer"];
+		$devices[$hash]["raw"]["manufacturer_override"] = $data["manufacturer_override"];
+		$devices[$hash]["formatted"]["manufacturer_override"] = $devices[$hash]["raw"]["manufacturer_override"];
 		$devices[$hash]["raw"]["model"] = $data["model_name"];
 		$devices[$hash]["formatted"]["model"] = $devices[$hash]["raw"]["model"];
 		$devices[$hash]["raw"]["capacity"] = $data["capacity"];
