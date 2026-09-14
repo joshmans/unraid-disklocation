@@ -1226,12 +1226,53 @@
 		return null;
 	}
 	
+	function is_valid_image_url($url) {
+		// Deliberately strict: https only, real host, path ending in a known image
+		// extension. This exists so a per-device override can optionally point at a
+		// manufacturer-hosted logo directly (hotlinked, not stored in this repo) rather
+		// than a local manufacturers/ file - see get_drive_brand_logo(). Rejects
+		// javascript:/data:/http: and anything without an image extension, since this
+		// value ends up directly in an <img src="">.
+		if(!is_string($url) || $url === "") {
+			return false;
+		}
+		if(!preg_match('#^https://#i', $url)) { // https only - no plain http, no other schemes
+			return false;
+		}
+		if(!filter_var($url, FILTER_VALIDATE_URL)) {
+			return false;
+		}
+		$host = parse_url($url, PHP_URL_HOST);
+		if(empty($host)) {
+			return false;
+		}
+		$path = parse_url($url, PHP_URL_PATH);
+		if(empty($path)) {
+			return false;
+		}
+		$ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+		$allowed_ext = array('svg', 'png', 'jpg', 'jpeg', 'webp', 'gif');
+		return in_array($ext, $allowed_ext, true);
+	}
+	
 	function get_drive_brand_logo($manufacturer_raw, $model, $manufacturer_override = null) {
 		// Looks for an SVG logo the admin (or a contributor to their fork) has placed under
 		// pages/styles/manufacturers/{slug}.svg. Disk Location does not ship any logos
 		// itself - see pages/styles/manufacturers/README.md for why, and how to add your
 		// own. Returns "" if no matching file exists, so callers can fall back gracefully
 		// (e.g. to the generic HDD/SSD/NVMe type icon from get_drive_type_icon()).
+		//
+		// The override also accepts a direct https image URL instead of a brand name -
+		// e.g. a manufacturer's own hosted logo - rendered as a hotlink rather than a
+		// file stored in this repo. This plugin never picks that URL itself; it's
+		// entirely the admin's choice per device. See is_valid_image_url() for exactly
+		// what's accepted, and manufacturers/README.md for the tradeoffs of hotlinking.
+		if(!empty($manufacturer_override) && is_valid_image_url($manufacturer_override)) {
+			$host = parse_url($manufacturer_override, PHP_URL_HOST);
+			$label = "Manufacturer logo (" . $host . ")";
+			return "<a class='info' style=\"margin: 0;\"><img src=\"" . htmlspecialchars($manufacturer_override) . "\" referrerpolicy=\"no-referrer\" loading=\"lazy\" style=\"height: 13px; width: auto; vertical-align: middle;\" alt=\"" . htmlspecialchars($label) . "\" /><span>" . htmlspecialchars($label) . "</span></a>";
+		}
+		
 		$slug = ( !empty($manufacturer_override) ? slugify_brand_name($manufacturer_override) : detect_drive_brand($manufacturer_raw, $model) );
 		if(empty($slug)) {
 			return "";
