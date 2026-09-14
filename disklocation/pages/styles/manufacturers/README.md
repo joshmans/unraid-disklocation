@@ -61,6 +61,34 @@ column is an editable text field. Leave it blank to use auto-detection (shown as
 field's placeholder text), or type the correct brand name to override it - the typed
 value is what gets slugified and matched against this folder.
 
+### Hotlinking a manufacturer-hosted logo instead
+
+The same override field also accepts a direct **https** image URL (ending in `.svg`,
+`.png`, `.jpg`, `.jpeg`, `.webp`, or `.gif`) instead of a brand name. If you'd rather
+point at a manufacturer's own hosted logo than download and commit a copy here, type
+the URL in and the tray tile will render it directly via `<img src="...">` - nothing
+gets stored in this repo for that device.
+
+This is a genuinely different tradeoff than bundling a file here, but it isn't a free
+pass either, and it's worth going in with eyes open:
+
+- It's on you to confirm the specific URL you use actually fits within that
+  manufacturer's own usage terms for this kind of embedding - most brand kits are
+  scoped to editorial/press use, and decorating a third-party admin tool's UI is a
+  different context that may or may not qualify.
+- Every time that tile renders, your Unraid box makes a live request to the
+  manufacturer's server. The plugin sets `referrerpolicy="no-referrer"` so it doesn't
+  leak which page/site made the request, but the request itself (and your server's IP)
+  still happens - a consideration for what's otherwise a fully local admin tool.
+- It depends on that URL staying valid long-term. Manufacturers reorganize their sites;
+  a hotlinked URL can break without warning, whereas a local file won't.
+- Most manufacturer press pages don't expose a stable, direct, hotlink-friendly image
+  URL anyway (many sit behind JS-rendered brand portals or deliver a zip download
+  instead) - so this option mainly helps when you've found one that does.
+
+Disk Location never picks or hardcodes a manufacturer URL itself; this is entirely a
+per-device choice you make.
+
 ## Where to find official logos
 
 The links below are each manufacturer's own press/brand resources, current as of when this
