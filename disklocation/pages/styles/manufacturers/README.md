@@ -89,6 +89,12 @@ HGST, Hitachi, Fujitsu) aren't included because a quick search didn't turn up an
 official logo-download page - their own newsroom/investor-relations/contact pages are the
 place to start looking.
 
+**Note on Crucial:** Micron discontinued the Crucial consumer brand in February 2026 and
+is winding down its operations. The `crucial` slug/detection is kept here anyway, since
+existing Crucial-branded drives are already out in the field and will be for years - this
+just means Crucial's own site is no longer the place to look for current-brand assets, and
+any logo you add for it should be treated as identifying a legacy/discontinued brand.
+
 ## Disclaimer
 
 All product names, logos, and brands referenced or displayed by this plugin are the
