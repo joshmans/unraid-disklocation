@@ -284,6 +284,9 @@
 					$unraid_array_icon = "";
 					$physical_traynumber = null;
 					
+					$drive_type_icon = ( isset($displayinfo["leddrivetype"]) ? get_drive_type_icon($devices[$hash]["raw"]["rotation"] ?? null) : "" );
+					$drive_brand_logo = ( isset($displayinfo["leddrivelogo"]) ? get_drive_brand_logo($devices[$hash]["raw"]["manufacturer"] ?? null, $devices[$hash]["raw"]["model"] ?? null, $devices[$hash]["raw"]["manufacturer_override"] ?? null) : "" );
+					
 					if(!$unraid_array[$devicenode]["temp"] || !is_numeric($unraid_array[$devicenode]["temp"])) { // && (!$unraid_array[$devicenode]["temp"] && $unraid_array[$devicenode]["hotTemp"] == 0 && $unraid_array[$devicenode]["maxTemp"] == 0)) {
 						$unraid_array[$devicenode]["temp"] = 0;
 						
@@ -436,7 +439,9 @@
 										<b>$physical_traynumber</b>$insert_break
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
-										$temp_status_icon
+										$temp_status_icon $insert_break
+										$drive_type_icon $insert_break
+										$drive_brand_logo
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\">
 										" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "

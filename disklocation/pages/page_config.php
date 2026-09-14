@@ -246,6 +246,8 @@ $(document).ready(function(){
 							<input type="checkbox" name="displayinfo[leddiskop]" value="1" <?php if(!empty($displayinfo["leddiskop"])) echo "checked"; ?> />Disk Operation LED<br />
 							<input type="checkbox" name="displayinfo[ledsmart]" value="1" <?php if(!empty($displayinfo["ledsmart"])) echo "checked"; ?> />SMART Status LED<br />
 							<input type="checkbox" name="displayinfo[ledtemp]" value="1" <?php if(!empty($displayinfo["ledtemp"])) echo "checked"; ?> />Temperature LED<br />
+							<input type="checkbox" name="displayinfo[leddrivetype]" value="1" <?php if(!empty($displayinfo["leddrivetype"])) echo "checked"; ?> />Drive Type icon (HDD/SSD/NVMe)<br />
+							<input type="checkbox" name="displayinfo[leddrivelogo]" value="1" <?php if(!empty($displayinfo["leddrivelogo"])) echo "checked"; ?> />Manufacturer logo (if added, see manufacturers/README.md)<br />
 						</td>
 						<td style="vertical-align: top; width: <?php echo $vi_width ?>px;">
 							<b>Other configurations:</b><br />

@@ -41,6 +41,8 @@
 		'leddiskop' => 1,
 		'ledsmart' => 1,
 		'ledtemp' => 1,
+		'leddrivetype' => 1,
+		'leddrivelogo' => 1,
 		'temperature' => 1,
 		'hideemptycontents' => 0,
 		'flashwarning' => 0,

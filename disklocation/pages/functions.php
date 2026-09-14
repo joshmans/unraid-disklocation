@@ -1163,6 +1163,118 @@
 		}
 	}
 	
+	function slugify_brand_name($name) {
+		// Normalizes a brand name into the filename convention used under manufacturers/,
+		// e.g. "Western Digital" -> "westerndigital", "SK hynix" -> "skhynix".
+		$slug = strtolower(trim($name));
+		$slug = preg_replace('/[^a-z0-9]+/', '', $slug);
+		return $slug;
+	}
+	
+	function detect_drive_brand($manufacturer_raw, $model) {
+		// Best-effort brand detection for the tray map's optional manufacturer logo (see
+		// get_drive_brand_logo()). $manufacturer_raw is smartctl's own model_family lookup,
+		// which is fairly reliable when present but is curated per drive family and often
+		// comes back empty - notably for many SSDs, which frequently identify themselves
+		// via a generic/OEM controller rather than a brand-specific one. In that case we
+		// fall back to matching common model-number prefixes. Neither source is exhaustive,
+		// which is exactly why this can be overridden per-device on the Tray Allocations
+		// page rather than relied on blindly.
+		$haystack = strtolower(($manufacturer_raw ?? "") . " " . ($model ?? ""));
+		if(trim($haystack) === "") {
+			return null;
+		}
+		
+		// [brand slug => array of substrings/prefixes to match, checked in order]
+		$brand_patterns = array(
+			"westerndigital"	=> array("western digital", "wdc ", "^wd"),
+			"seagate"			=> array("seagate", "^st[0-9]"),
+			"toshiba"			=> array("toshiba", "^dt0", "^mg0", "^hdwd", "^hdwn"),
+			"hgst"				=> array("hgst", "^huh", "^hus"),
+			"samsung"			=> array("samsung", "^mz", "^pm"),
+			"crucial"			=> array("crucial", "^ct[0-9].*ssd"),
+			"micron"			=> array("micron", "^mtfd"),
+			"sandisk"			=> array("sandisk", "^sds"),
+			"kingston"			=> array("kingston", "^sa400", "^skc", "^suv", "^ov[0-9]"),
+			"intel"				=> array("intel", "^ssdsc", "^ssdpe"),
+			"adata"				=> array("adata", "^asu", "^su[0-9]"),
+			"corsair"			=> array("corsair", "^cssd"),
+			"skhynix"			=> array("sk hynix", "hynix", "^hfs", "^pc[0-9]"),
+			"lexar"				=> array("lexar", "^ln[dm]"),
+			"teamgroup"			=> array("team group", "teamgroup", "^t-force"),
+			"patriot"			=> array("patriot", "^psf", "^pss"),
+			"siliconpower"		=> array("silicon power", "^sp[0-9]"),
+			"transcend"			=> array("transcend", "^ts[0-9].*ssd"),
+			"pny"				=> array("pny", "^cs9"),
+			"fujitsu"			=> array("fujitsu", "^mja"),
+			"hitachi"			=> array("hitachi", "^hds"),
+		);
+		
+		foreach($brand_patterns as $slug => $patterns) {
+			foreach($patterns as $pattern) {
+				if($pattern[0] === "^") {
+					if(preg_match('/' . substr($pattern, 1) . '/i', trim(strtolower($model ?? "")))) {
+						return $slug;
+					}
+				}
+				else if(strpos($haystack, $pattern) !== false) {
+					return $slug;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	function get_drive_brand_logo($manufacturer_raw, $model, $manufacturer_override = null) {
+		// Looks for an SVG logo the admin (or a contributor to their fork) has placed under
+		// pages/styles/manufacturers/{slug}.svg. Disk Location does not ship any logos
+		// itself - see pages/styles/manufacturers/README.md for why, and how to add your
+		// own. Returns "" if no matching file exists, so callers can fall back gracefully
+		// (e.g. to the generic HDD/SSD/NVMe type icon from get_drive_type_icon()).
+		$slug = ( !empty($manufacturer_override) ? slugify_brand_name($manufacturer_override) : detect_drive_brand($manufacturer_raw, $model) );
+		if(empty($slug)) {
+			return "";
+		}
+		
+		$logo_file_disk = "/usr/local/emhttp" . DISKLOCATION_PATH . "/pages/styles/manufacturers/" . $slug . ".svg";
+		if(!file_exists($logo_file_disk)) {
+			return "";
+		}
+		
+		$logo_url = DISKLOCATION_PATH . "/pages/styles/manufacturers/" . $slug . ".svg";
+		$label = ( !empty($manufacturer_override) ? $manufacturer_override : ucfirst($slug) );
+		return "<a class='info' style=\"margin: 0;\"><img src=\"" . htmlspecialchars($logo_url) . "\" style=\"height: 13px; width: auto; vertical-align: middle;\" alt=\"" . htmlspecialchars($label) . "\" /><span>" . htmlspecialchars($label) . "</span></a>";
+	}
+	
+	function get_drive_type_icon($rotation) {
+		// Reuses the same $rotation convention as get_smart_rotation(): -2 = NVMe SSD,
+		// -1 = SATA/SAS SSD, 0/null = unknown, positive = HDD at that RPM. Returns an
+		// inline SVG (rather than a font-icon class) so it renders identically regardless
+		// of which icon font Unraid's webGUI happens to bundle, wrapped in the same
+		// 'info' tooltip pattern used by the other tray status icons (see devices.php).
+		//
+		// These are small original line-art glyphs, not any vendor/manufacturer logo -
+		// vendor logos are trademarked artwork we deliberately don't reproduce here.
+		switch(true) {
+			case ($rotation == -2): // NVMe
+				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><rect x='1' y='5' width='14' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='1.3'/><rect x='3' y='7' width='8' height='2' fill='currentColor'/><circle cx='13' cy='8' r='0.8' fill='currentColor'/></svg>";
+				$label = "NVMe SSD";
+				break;
+			case ($rotation == -1): // SATA/SAS SSD
+				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><rect x='1.5' y='3' width='13' height='10' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.3'/><rect x='4' y='6.5' width='3' height='3' fill='currentColor'/><rect x='9' y='6.5' width='3' height='3' fill='currentColor'/></svg>";
+				$label = "SSD";
+				break;
+			case (!empty($rotation) && $rotation > 0): // HDD
+				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><circle cx='8' cy='8' r='6.5' fill='none' stroke='currentColor' stroke-width='1.3'/><circle cx='8' cy='8' r='1.8' fill='currentColor'/><line x1='8' y1='2.2' x2='8' y2='5.2' stroke='currentColor' stroke-width='1.3'/></svg>";
+				$label = $rotation . " RPM";
+				break;
+			default: // unknown - don't show an icon at all, consistent with the other status icons when data is unavailable
+				return "";
+		}
+		return "<a class='info' style=\"margin: 0;\"><span style=\"display: inline-block; vertical-align: middle;\">" . $svg . "</span><span>Drive type: " . $label . "</span></a>";
+	}
+	
 	function get_smart_rotation($input) {
 		switch($input) {
 			case -2:
