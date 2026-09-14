@@ -435,6 +435,16 @@
 		fpassthru($f);
 	}
 	
+	function array_to_json_download($data, $filename = "output.json") {
+		// $data is expected to be a plain associative/indexed array ready for json_encode()
+		// (unlike array_to_csv_download, this does not need a header row baked into the array)
+		$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		header('Content-Type: application/json');
+		header('Content-Disposition: attachment; filename="'.$filename.'";');
+		header('Content-Length: ' . strlen($json));
+		echo $json;
+	}
+	
 	function is_tray_allocated($db, $tray, $gid) {
 		$array_locations = $db;
 		foreach($array_locations as $hash => $array) {
