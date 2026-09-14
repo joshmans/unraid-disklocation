@@ -160,6 +160,7 @@
 			$listarray["installed"] = "<td style=\"white-space: nowrap; padding: 0 10px 0 10px; text-align: right;\"><input type=\"date\" name=\"installed[" . $hash . "]\" max=\"9999-12-31\" value=\"" . $data["installed"] . "\" style=\"min-width: 0; max-width: 130px; width: 130px;\" /></td>";
 			$listarray["warranty"] = "<td style=\"white-space: nowrap; padding: 0 10px 0 10px; text-align: right;\"><select name=\"warranty[" . $hash . "]\" style=\"min-width: 0; max-width: 80px; width: 80px;\"><option value=\"\" style=\"text-align: right;\" " . ( $allow_unraid_edit ? null : "disabled=\"disabled\"" ) . ">unknown</option>" . $warr_options . "</select></td>";
 			$listarray["comment"] = "<td style=\"white-space: nowrap; padding: 0 10px 0 10px; text-align: right;\"><input type=\"text\" name=\"comment[" . $hash . "]\" value=\"" . stripslashes(htmlspecialchars($data["comment"])) . "\" style=\"width: 150px;\" /></td>";
+			$listarray["manufacturer"] = "<td style=\"white-space: nowrap; padding: 0 10px 0 10px; text-align: right;\"><input type=\"text\" name=\"manufacturer_override[" . $hash . "]\" value=\"" . stripslashes(htmlspecialchars($data["manufacturer_override"])) . "\" placeholder=\"" . htmlspecialchars($data["manufacturer"]) . "\" style=\"width: 150px;\" /></td>";
 			
 			$print_drives[$i_drive][$status] .= "<tr style=\"background: #" . $color_array[$hash] . ";\">";
 			$print_drives[$i_drive][$status] .= "

@@ -366,6 +366,8 @@
 			
 			$array_devices[$results[$id]["hash"]]["comment"] = ( !empty($_POST["comment"][$results[$id]["hash"]]) ? $_POST["comment"][$results[$id]["hash"]] : null );
 			
+			$array_devices[$results[$id]["hash"]]["manufacturer_override"] = ( !empty($_POST["manufacturer_override"][$results[$id]["hash"]]) ? $_POST["manufacturer_override"][$results[$id]["hash"]] : null );
+			
 			$array_devices[$results[$id]["hash"]]["color"] = ( (!empty($_POST["bgcolor_custom"][$results[$id]["hash"]]) && strtoupper($_POST["bgcolor_custom"][$results[$id]["hash"]]) != "#".strtoupper($bgcolor_empty)) ? str_replace("#", "", strtoupper($_POST["bgcolor_custom"][$results[$id]["hash"]])) : null );
 			
 			if($allow_unraid_edit) {
