@@ -61,6 +61,34 @@ column is an editable text field. Leave it blank to use auto-detection (shown as
 field's placeholder text), or type the correct brand name to override it - the typed
 value is what gets slugified and matched against this folder.
 
+## Where to find official logos
+
+The links below are each manufacturer's own press/brand resources, current as of when this
+was written - websites reorganize, so if a link is stale, search the manufacturer's site
+for "press," "media kit," "newsroom," or "brand assets." A few (Toshiba, SK hynix,
+Corsair) don't have a dedicated logo-download page; for those, the newsroom/press contact
+is the starting point instead. Always check each site's own usage terms before adding a
+file here - some require written permission for anything beyond editorial/news use, which
+this plugin's display case may or may not fall under depending on how you read it.
+
+| Slug             | Brand           | Official source                                                                 |
+|------------------|-----------------|----------------------------------------------------------------------------------|
+| westerndigital   | Western Digital | https://www.westerndigital.com/company/newsroom/brand-assets                    |
+| seagate          | Seagate         | https://www.seagate.com/stories/media-assets/company-logos/                     |
+| samsung          | Samsung         | https://www.samsung.com/us/about-us/brand-identity/logo/                        |
+| kingston         | Kingston        | https://www.kingston.com/en/company/public-relations (assets via LoDA, linked from that page) |
+| crucial / micron | Crucial/Micron  | https://www.micron.com/about/press/image-gallery/micron-logos                   |
+| sandisk          | SanDisk         | https://www.sandisk.com/company/newsroom                                        |
+| intel            | Intel           | https://newsroom.intel.com/press-hub                                            |
+| toshiba          | Toshiba         | https://news.toshiba.com/press-releases/default.aspx (newsroom; contact PR for assets) |
+| skhynix          | SK hynix        | https://news.skhynix.com/press-center/press-release/ (newsroom; contact PR for assets) |
+| corsair          | Corsair         | https://www.corsair.com/newsroom/press-release/category/product-announcements (newsroom; contact PR for assets) |
+
+Brands not listed here (ADATA, Patriot, Silicon Power, Transcend, PNY, Lexar, Team Group,
+HGST, Hitachi, Fujitsu) aren't included because a quick search didn't turn up an obvious
+official logo-download page - their own newsroom/investor-relations/contact pages are the
+place to start looking.
+
 ## Disclaimer
 
 All product names, logos, and brands referenced or displayed by this plugin are the
