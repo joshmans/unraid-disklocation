@@ -13,4 +13,8 @@ Licensed under GNU GPL version 3
 
 ---
 
+See [ROADMAP.md](ROADMAP.md) for where the project is headed, including the plan to eventually rebuild on Unraid's native NestJS/TypeScript plugin architecture while keeping this PHP version in maintenance mode.
+
+---
+
 **Manufacturer logos:** the tray map can optionally show manufacturer logos for drive identification. Disk Location does not ship any logos itself - see [`disklocation/pages/styles/manufacturers/README.md`](disklocation/pages/styles/manufacturers/README.md) for details, including the trademark disclaimer.
