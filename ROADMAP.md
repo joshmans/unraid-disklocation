@@ -19,9 +19,6 @@ a set of planned improvements within that architecture:
 - [x] Drive type icons (HDD/SSD/NVMe) and an optional manufacturer logo framework
       (auto-detect + manual override, including hotlinking a manufacturer-hosted URL) -
       no logos shipped in-repo; see `disklocation/pages/styles/manufacturers/README.md`
-- [ ] REST/JSON status endpoint, single static token auth (in progress) - for tools like
-      Home Assistant, Grafana, or Homepage to poll current disk/tray/SMART state without
-      needing an Unraid webGUI session
 - [ ] SMART history graphing - currently blocked on the fact that no history is
       retained at all today (`cronjob.php` overwrites one config file on every scan).
       Needs its own short design pass before implementation: what to store, at what
@@ -54,8 +51,25 @@ Starting with Unraid 7.2, Unraid ships a built-in GraphQL API (`unraid-api`) wit
 plugin architecture: plugins can register their own GraphQL resolvers, background jobs,
 and WebGUI components, on NestJS/TypeScript/Node.js, with API keys/session
 cookies/SSO-OIDC auth already built in. That's the modern, sanctioned way to integrate
-deeply with Unraid going forward, and a rewrite on that foundation would likely obsolete
-the need for Phase 1's custom token-based REST endpoint entirely - consumers could query
+deeply with Unraid going forward.
+
+**REST/JSON status endpoint (moved here from Phase 1):** we scoped and partly built this
+as a single-static-token PHP endpoint for tools like Home Assistant, Grafana, or Homepage
+to poll current disk/tray/SMART state without an Unraid webGUI session. It turned out not
+to be buildable that way: Unraid's own webGUI auth wall sits in front of every path under
+the webGUI, including plugin script paths, and there's no supported way for a third-party
+classic PHP plugin to carve out an exception - confirmed by testing directly against a
+live instance (an unauthenticated request to an existing plugin export endpoint gets
+redirected to the Unraid login page rather than reaching the PHP script at all). The only
+precedent for that kind of nginx exception is Unraid's own core team patching their
+bundled config for their own official Connect plugin - not a mechanism available to us,
+and not something worth this plugin trying to replicate given the fragility (config gets
+regenerated) and security responsibility involved. Unraid's native GraphQL API is
+specifically built with its own supported auth (API keys) at a documented layer designed
+for exactly this - the right home for real external-polling access, rather than a
+workaround bolted onto the PHP-era plugin.
+
+This would also obsolete the need for that custom token entirely - consumers could query
 Disk Location's data straight through Unraid's own GraphQL surface, using auth Unraid
 already provides.
 
