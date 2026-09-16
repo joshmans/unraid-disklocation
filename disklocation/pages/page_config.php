@@ -258,18 +258,31 @@ $(document).ready(function(){
 					<tr>
 						<td style="vertical-align: top; width: <?php echo $vi_width ?>px;">
 							<b>LED array:</b><br />
-							<input type="checkbox" name="displayinfo[tray]" value="1" <?php if(!empty($displayinfo["tray"])) echo "checked"; ?> />Tray number<br />
-							<input type="checkbox" name="displayinfo[leddiskop]" value="1" <?php if(!empty($displayinfo["leddiskop"])) echo "checked"; ?> />Disk Operation LED<br />
-							<input type="checkbox" name="displayinfo[ledsmart]" value="1" <?php if(!empty($displayinfo["ledsmart"])) echo "checked"; ?> />SMART Status LED<br />
-							<input type="checkbox" name="displayinfo[ledtemp]" value="1" <?php if(!empty($displayinfo["ledtemp"])) echo "checked"; ?> />Temperature LED<br />
-							<input type="checkbox" name="displayinfo[leddrivetype]" value="1" <?php if(!empty($displayinfo["leddrivetype"])) echo "checked"; ?> />Drive Type icon (HDD/SSD/NVMe)<br />
-							<input type="checkbox" name="displayinfo[leddrivelogo]" value="1" <?php if(!empty($displayinfo["leddrivelogo"])) echo "checked"; ?> />Manufacturer logo (if added, see manufacturers/README.md)<br />
+							<?php /*
+								Each checkbox is paired with a hidden "0" fallback of the same name, submitted
+								first in DOM order. An unchecked box sends only the hidden 0 (the box itself
+								is never submitted at all); a checked box's "1" arrives after and wins - PHP
+								keeps the last value for a repeated form field name. Without this, an
+								unchecked box vanishes from $_POST entirely, so system.php's save silently
+								drops that key from settings.json's displayinfo object rather than storing an
+								explicit 0 - indistinguishable on next load from "never configured", which for
+								any option defaulting on means it can never be durably turned off, and means
+								any option added after a given install last saved its settings silently
+								defaults to off instead of showing up as intended (see the drive-type-icon /
+								manufacturer-logo release, and devices.php's isset($displayinfo[...]) checks).
+							*/ ?>
+							<input type="hidden" name="displayinfo[tray]" value="0" /><input type="checkbox" name="displayinfo[tray]" value="1" <?php if(!empty($displayinfo["tray"])) echo "checked"; ?> />Tray number<br />
+							<input type="hidden" name="displayinfo[leddiskop]" value="0" /><input type="checkbox" name="displayinfo[leddiskop]" value="1" <?php if(!empty($displayinfo["leddiskop"])) echo "checked"; ?> />Disk Operation LED<br />
+							<input type="hidden" name="displayinfo[ledsmart]" value="0" /><input type="checkbox" name="displayinfo[ledsmart]" value="1" <?php if(!empty($displayinfo["ledsmart"])) echo "checked"; ?> />SMART Status LED<br />
+							<input type="hidden" name="displayinfo[ledtemp]" value="0" /><input type="checkbox" name="displayinfo[ledtemp]" value="1" <?php if(!empty($displayinfo["ledtemp"])) echo "checked"; ?> />Temperature LED<br />
+							<input type="hidden" name="displayinfo[leddrivetype]" value="0" /><input type="checkbox" name="displayinfo[leddrivetype]" value="1" <?php if(!empty($displayinfo["leddrivetype"])) echo "checked"; ?> />Drive Type icon (HDD/SSD/NVMe)<br />
+							<input type="hidden" name="displayinfo[leddrivelogo]" value="0" /><input type="checkbox" name="displayinfo[leddrivelogo]" value="1" <?php if(!empty($displayinfo["leddrivelogo"])) echo "checked"; ?> />Manufacturer logo (if added, see manufacturers/README.md)<br />
 						</td>
 						<td style="vertical-align: top; width: <?php echo $vi_width ?>px;">
 							<b>Other configurations:</b><br />
-							<input type="checkbox" name="displayinfo[hideemptycontents]" value="1" <?php if(!empty($displayinfo["hideemptycontents"])) echo "checked"; ?> />Hide empty tray contents<br />
-							<input type="checkbox" name="displayinfo[flashwarning]" value="1" <?php if(!empty($displayinfo["flashwarning"])) echo "checked"; ?> />Flash warning<br />
-							<input type="checkbox" name="displayinfo[flashcritical]" value="1" <?php if(!empty($displayinfo["flashcritical"])) echo "checked"; ?> />Flash critical<br />
+							<input type="hidden" name="displayinfo[hideemptycontents]" value="0" /><input type="checkbox" name="displayinfo[hideemptycontents]" value="1" <?php if(!empty($displayinfo["hideemptycontents"])) echo "checked"; ?> />Hide empty tray contents<br />
+							<input type="hidden" name="displayinfo[flashwarning]" value="0" /><input type="checkbox" name="displayinfo[flashwarning]" value="1" <?php if(!empty($displayinfo["flashwarning"])) echo "checked"; ?> />Flash warning<br />
+							<input type="hidden" name="displayinfo[flashcritical]" value="0" /><input type="checkbox" name="displayinfo[flashcritical]" value="1" <?php if(!empty($displayinfo["flashcritical"])) echo "checked"; ?> />Flash critical<br />
 						</td>
 						<td style="vertical-align: top; width: 60%;" rowspan="2">
 							<b>Dashboard formatting:</b><br >
