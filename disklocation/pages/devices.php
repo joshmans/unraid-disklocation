@@ -431,6 +431,23 @@
 						$add_anim_bg_class = "class=\"red-blink-disklocation-bg\"";
 					}
 					
+					// Horizontal trays get the icon as a bottom-right badge, with reserved space
+					// (padding-right) and shrink/wrap allowances (min-width/overflow-wrap) so a
+					// long unbreakable string like a serial number can't push it out of the
+					// tile - see get_drive_type_icon()'s comment for why those are needed.
+					// Vertical trays already rotate their text via .flex-container-middle_v's
+					// own writing-mode: vertical-rl, and tray width/height are swapped (see
+					// above) - the icon is rotated to match and anchored bottom-left instead,
+					// which needs neither the reserved padding nor the shrink allowances.
+					if($disk_tray_direction == "v") {
+						$drive_type_icon_column_style = "position: relative;";
+						$drive_type_icon_badge_style = "position: absolute; bottom: 0; left: 0; transform: rotate(90deg); transform-origin: bottom left;";
+					}
+					else {
+						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";";
+						$drive_type_icon_badge_style = "position: absolute; bottom: 0; right: 0;";
+					}
+
 					$disklocation_page[$gid] .= "
 						<div style=\"order: " . $drive_tray_order[$hash] . "\">
 							<div class=\"flex-container_" . $disk_tray_direction . "\">
@@ -442,8 +459,8 @@
 										$temp_status_icon $insert_break
 										$drive_brand_logo
 									</div>
-									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";\">
-										<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"$drive_type_icon_column_style\">
+										<span style=\"$drive_type_icon_badge_style\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>
