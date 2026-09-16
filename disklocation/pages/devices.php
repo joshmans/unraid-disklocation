@@ -431,23 +431,35 @@
 						$add_anim_bg_class = "class=\"red-blink-disklocation-bg\"";
 					}
 					
-					// Horizontal trays get the icon as a bottom-right badge, with reserved space
-					// (padding-right) and shrink/wrap allowances (min-width/overflow-wrap) so a
-					// long unbreakable string like a serial number can't push it out of the
-					// tile - see get_drive_type_icon()'s comment for why those are needed.
-					// Vertical trays already rotate their text via .flex-container-middle_v's
-					// own writing-mode: vertical-rl, and tray width/height are swapped (see
-					// above) - the icon is rotated to match and anchored bottom-left instead,
-					// which needs neither the reserved padding nor the shrink allowances.
+					// Horizontal trays get the icon as a bottom-right badge in the device-info
+					// column, with reserved space (padding-right) and shrink/wrap allowances
+					// (min-width/overflow-wrap) so a long unbreakable string like a serial
+					// number can't push it out of the tile - see get_drive_type_icon()'s
+					// comment for why those are needed.
+					//
+					// Vertical trays can't use that same column: .flex-container-middle_v's own
+					// content (rotated via its own writing-mode: vertical-rl) can already need
+					// more height than a vertical tray provides on its own, before this icon is
+					// even added - confirmed by measuring actual rendered layout, not just
+					// visually. Anchoring the icon to that column means it inherits whatever
+					// overflow the text already has. The tray-number/status-icon column
+					// (.flex-container-start) doesn't have that problem - it's a small, fixed
+					// set of items - so the icon goes there instead for a vertical tray,
+					// appended to that same list of icons. It's deliberately NOT rotated there:
+					// that column doesn't share the device-info column's vertical-rl
+					// writing-mode, so a rotated icon there wouldn't be matching anything, just
+					// sitting sideways among upright neighbors.
 					if($disk_tray_direction == "v") {
-						$drive_type_icon_column_style = "position: relative;";
-						$drive_type_icon_badge_style = "position: absolute; bottom: 0; left: 0; transform: rotate(90deg); transform-origin: bottom left;";
+						$drive_type_icon_start_line = ( !empty($drive_type_icon) ? "$insert_break $drive_type_icon" : "" );
+						$drive_type_icon_middle_html = "";
+						$drive_type_icon_column_style = "";
 					}
 					else {
+						$drive_type_icon_start_line = "";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>";
 						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";";
-						$drive_type_icon_badge_style = "position: absolute; bottom: 0; right: 0;";
 					}
-
+					
 					$disklocation_page[$gid] .= "
 						<div style=\"order: " . $drive_tray_order[$hash] . "\">
 							<div class=\"flex-container_" . $disk_tray_direction . "\">
@@ -457,10 +469,10 @@
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
 										$temp_status_icon $insert_break
-										$drive_brand_logo
+										$drive_brand_logo$drive_type_icon_start_line
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"$drive_type_icon_column_style\">
-										<span style=\"$drive_type_icon_badge_style\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+										$drive_type_icon_middle_html" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>
