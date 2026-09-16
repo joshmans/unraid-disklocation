@@ -438,8 +438,11 @@
 					// push it out of the tile - see get_drive_type_icon()'s comment for why
 					// those are needed.
 					//
-					// Vertical trays get the same chip, bottom-left and rotated 90deg to match
-					// .flex-container-middle_v's own writing-mode: vertical-rl text. That column
+					// Vertical trays get the same chip, bottom-left and rotated -90deg to match
+					// .flex-container-middle_v's own writing-mode: vertical-rl text (confirmed by
+					// rendering plain text both ways and comparing - vertical-rl/sideways text
+					// rotates counter-clockwise, not clockwise, so this needs -90deg and not the
+					// +90deg it's easy to assume from "rotated 90deg"). That column
 					// needs two fixes of its own first though, both confirmed by measuring
 					// actual rendered layout rather than trusting a screenshot (which had missed
 					// smaller versions of both issues before):
@@ -477,7 +480,7 @@
 					if($disk_tray_direction == "v") {
 						$drive_type_icon_start_style = "flex-shrink: 0;";
 						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; overflow-wrap: break-word; position: relative;";
-						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; left: 0; transform: rotate(90deg);\">$drive_type_icon</span>";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; left: 0; transform: rotate(-90deg);\">$drive_type_icon</span>";
 					}
 					else {
 						$drive_type_icon_start_style = "";
