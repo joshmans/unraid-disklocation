@@ -134,3 +134,33 @@ input.diskLocation {
 		padding-bottom: 10px; /* keep the scrollbar from sitting on top of the bottom row of trays */
 	}
 }
+
+/* Trends tab: one card per device, each holding up to three stacked charts. */
+.dl-trend-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+	gap: 15px;
+	padding: 10px;
+}
+.dl-trend-card {
+	border: 2px solid #000000;
+	border-radius: 5px;
+	padding: 10px 15px 15px 15px;
+}
+.dl-trend-card h3 {
+	margin: 0 0 10px 0;
+}
+.dl-trend-canvas {
+	width: 100% !important;
+	height: 180px !important;
+	margin-bottom: 15px;
+}
+.dl-trend-empty {
+	opacity: 0.8;
+	font-style: italic;
+}
+@media (max-width: 900px) {
+	.dl-trend-grid {
+		grid-template-columns: 1fr;
+	}
+}

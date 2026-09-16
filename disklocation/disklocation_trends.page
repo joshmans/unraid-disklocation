@@ -1,0 +1,13 @@
+Menu="disklocation:6"
+Icon="line-chart"
+Tag="line-chart"
+Title="Trends"
+---
+<?php
+	$time_start = (($debug || isset($_GET["benchmark"])) ? hrtime(true) : null);
+
+	require_once("/usr/local/emhttp/plugins/disklocation/pages/page_trends.php");
+
+	$page_time_load["trends"] = ( $debug ? round((hrtime(true)-$time_start)/1e+6, 1) : null );
+	print(isset($_GET["benchmark"]) ? "<h1 style=\"position: fixed; left: 5px; bottom: 20px; white-space: no-wrap; color: #0099FF; background-color: #111111;\">Trends: " . (round((hrtime(true)-$time_start)/1e+6, 1) . " ms</h1>\n") : null);
+?>
