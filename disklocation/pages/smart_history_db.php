@@ -202,4 +202,31 @@
 
 		return $stmt->execute() !== false;
 	}
+
+	// All rows for one device, oldest first - the shape the Trends page charts want.
+	// Small enough to load in full at this data rate (~2 rows/device/day) even across
+	// the full default 2-year retention window, so no pagination/windowing here.
+	function smart_history_get($hash) {
+		$db = smart_history_connect();
+
+		$stmt = $db->prepare("
+			SELECT scanned_at, temp, power_on_hours, reallocated_sectors, pending_sectors, uncorrectable_sectors, wear_level, smart_status
+			FROM smart_history WHERE hash = :hash ORDER BY scanned_at ASC
+		");
+		if(!$stmt) {
+			return array();
+		}
+		$stmt->bindValue(":hash", $hash, SQLITE3_TEXT);
+
+		$result = $stmt->execute();
+		if(!$result) {
+			return array();
+		}
+
+		$rows = array();
+		while($row = $result->fetchArray(SQLITE3_ASSOC)) {
+			$rows[] = $row;
+		}
+		return $rows;
+	}
 ?>
