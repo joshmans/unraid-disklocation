@@ -437,49 +437,52 @@
 					// number can't push it out of the tile - see get_drive_type_icon()'s
 					// comment for why those are needed.
 					//
-					// Vertical trays can't use that same column: .flex-container-middle_v's own
-					// content (rotated via its own writing-mode: vertical-rl) can already need
-					// more height than a vertical tray provides on its own, before this icon is
-					// even added - confirmed by measuring actual rendered layout, not just
-					// visually. Anchoring the icon to that column means it inherits whatever
-					// overflow the text already has. The tray-number/status-icon column
-					// (.flex-container-start) doesn't have that problem - it's a small, fixed
-					// set of items - so the icon goes there instead for a vertical tray,
-					// appended to that same list of icons. It's deliberately NOT rotated there:
-					// that column doesn't share the device-info column's vertical-rl
-					// writing-mode, so a rotated icon there wouldn't be matching anything, just
-					// sitting sideways among upright neighbors.
+					// Vertical trays get the same badge, bottom-left and rotated 90deg to match
+					// .flex-container-middle_v's own writing-mode: vertical-rl text. That column
+					// needs its own fix first though: with no explicit height, vertical-rl
+					// content has no block-size limit to wrap additional columns against, so it
+					// grows one tall column indefinitely and overflows the tile's bottom edge
+					// once there's enough device-info text - confirmed by measuring actual
+					// rendered layout, independent of this icon entirely. flex: 1 1 0 (basis
+					// zero, so the flex algorithm - not content size - drives it) plus
+					// min-height: 0 (so it can actually shrink to that computed size instead of
+					// refusing to go below its content's own intrinsic height, the default)
+					// gives it a real height constraint to wrap against, mirroring the
+					// analogous min-width: 0 fix for the horizontal case's width axis.
+					// flex-shrink: 0 on .flex-container-start keeps the tray-number/status-icon
+					// row from being squeezed in exchange - it should stay at its natural size
+					// while the device-info column is the one that adapts.
 					//
-					// That column also sets white-space: nowrap (so the small status orbs stay
-					// on one line rather than wrapping awkwardly) - this icon is a lot wider
-					// than those, so appending it as plain inline content the same way pushed
-					// the row's total width past the tile's own (confirmed by measuring, not
-					// just looking: it overflowed the tile's right edge by ~15px on a 70px-wide
-					// default vertical tray). Wrapping it in its own <div> forces it onto its
-					// own line regardless of the row's nowrap setting - block boxes don't
-					// participate in the parent's inline nowrap flow - without having to touch
-					// that nowrap setting itself, which the other, smaller icons still rely on.
+					// The badge's rotation relies on the default (center) transform-origin: an
+					// earlier attempt set transform-origin to the same corner as the position
+					// anchor (bottom left), which swings a 90deg-rotated box to the *opposite*
+					// side of its pivot rather than rotating in place, pushing it outside the
+					// tile. Rotating a (near-)square element around its own center keeps its
+					// bounding box unchanged, so anchoring via bottom/left and rotating around
+					// center compose safely - confirmed by direct measurement, not just how it
+					// looked in a screenshot, which had missed a smaller version of this same
+					// issue once already.
 					if($disk_tray_direction == "v") {
-						$drive_type_icon_start_line = ( !empty($drive_type_icon) ? "<div style=\"white-space: normal;\">$drive_type_icon</div>" : "" );
-						$drive_type_icon_middle_html = "";
-						$drive_type_icon_column_style = "";
+						$drive_type_icon_start_style = "flex-shrink: 0;";
+						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; position: relative;";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; left: 0; transform: rotate(90deg);\">$drive_type_icon</span>";
 					}
 					else {
-						$drive_type_icon_start_line = "";
-						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>";
+						$drive_type_icon_start_style = "";
 						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>";
 					}
 					
 					$disklocation_page[$gid] .= "
 						<div style=\"order: " . $drive_tray_order[$hash] . "\">
 							<div class=\"flex-container_" . $disk_tray_direction . "\">
 								<div id=\"bg1-" . $device . "\" $add_anim_bg_class style=\"background-color: #" . ( !empty($add_anim_bg_class) ? $color_array_blinker : $color_array[$hash] ) . "; width: " . $tray_width . "px; height: " . $tray_height . "px;\">
-									<div class=\"flex-container-start\" style=\"white-space: nowrap;\">
+									<div class=\"flex-container-start\" style=\"white-space: nowrap; $drive_type_icon_start_style\">
 										<b>$physical_traynumber</b>$insert_break
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
 										$temp_status_icon $insert_break
-										$drive_brand_logo$drive_type_icon_start_line
+										$drive_brand_logo
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"$drive_type_icon_column_style\">
 										$drive_type_icon_middle_html" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
@@ -488,7 +491,7 @@
 							</div>
 						</div>
 					";
-					
+
 					$add_physical_tray_order = "";
 					if($drive_tray_order[$hash] != $physical_traynumber) {
 						$add_physical_tray_order = $drive_tray_order[$hash];
