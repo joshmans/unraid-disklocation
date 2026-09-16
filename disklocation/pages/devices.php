@@ -449,8 +449,18 @@
 					// that column doesn't share the device-info column's vertical-rl
 					// writing-mode, so a rotated icon there wouldn't be matching anything, just
 					// sitting sideways among upright neighbors.
+					//
+					// That column also sets white-space: nowrap (so the small status orbs stay
+					// on one line rather than wrapping awkwardly) - this icon is a lot wider
+					// than those, so appending it as plain inline content the same way pushed
+					// the row's total width past the tile's own (confirmed by measuring, not
+					// just looking: it overflowed the tile's right edge by ~15px on a 70px-wide
+					// default vertical tray). Wrapping it in its own <div> forces it onto its
+					// own line regardless of the row's nowrap setting - block boxes don't
+					// participate in the parent's inline nowrap flow - without having to touch
+					// that nowrap setting itself, which the other, smaller icons still rely on.
 					if($disk_tray_direction == "v") {
-						$drive_type_icon_start_line = ( !empty($drive_type_icon) ? "$insert_break $drive_type_icon" : "" );
+						$drive_type_icon_start_line = ( !empty($drive_type_icon) ? "<div style=\"white-space: normal;\">$drive_type_icon</div>" : "" );
 						$drive_type_icon_middle_html = "";
 						$drive_type_icon_column_style = "";
 					}
