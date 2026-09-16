@@ -158,6 +158,10 @@
 	$force_scan = 0;
 	$force_scan_db = 0;
 	$devices = array();
+	// tracks hashes already given a history row this run - some systems enumerate the same
+	// physical device more than once in $lsscsi_arr (multi-LUN/multi-path controllers, see
+	// $ignore_multi_lun), which would otherwise produce duplicate history rows per scan.
+	$smart_history_seen = array();
 	
 	// add and update disk info
 	if(isset($_POST["force_smartdb_scan"]) || isset($_GET["force_smartdb_scan"]) || isset($_POST["force_smart_scan"]) || isset($_GET["force_smart_scan"]) || in_array("install", $argv) || in_array("force", $argv) || in_array("forceall", $argv)) {
@@ -177,7 +181,12 @@
 		
 		// grab changes just in case, this will decrease Disk Location plugin loading time drastically.
 		$phyloc_array = update_temp_files();
-		
+
+		if(!in_array("status", $argv)) {
+			// prune once per full-scan invocation, not per device below.
+			smart_history_prune($smart_history_retention_years);
+		}
+
 		if($force_scan_db && !in_array("status", $argv)) {
 			// wait until the cronjob has finished.
 			$retry_delay = 1;
@@ -310,6 +319,12 @@
 						if(isset($smart_array["serial_number"]) && $smart_model_name && $smart_array["smart_support"]["available"] == true && $smart_array["smart_support"]["enabled"] == true) {
 							$filename_smart_data_tmp = DISKLOCATION_TMP_PATH."/smart/".preg_replace($pattern_device_name, "_", $smart_model_name)."_" . $smart_array["serial_number"] . ".json";
 							file_put_contents($filename_smart_data_tmp, $smart_cmd[$i]);
+
+							// one history row per device per completed full scan (~2x/day, see disklocation-master.plg's cron block).
+							if(!isset($smart_history_seen[$deviceid[$i]])) {
+								smart_history_insert($deviceid[$i], $smart_array);
+								$smart_history_seen[$deviceid[$i]] = true;
+							}
 						}
 						
 						$debug_log[] = debug($debug, basename(__FILE__), __LINE__, "CRONJOB", "#:" . $i . "|DEV:" . $lsscsi_device[$i] . "=" . ( is_array($smart_array) ? "array" : "empty" ) . "");

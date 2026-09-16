@@ -235,6 +235,22 @@ $(document).ready(function(){
 					When setting this to "NO", the options are not editable via the plugin.
 					<br />
 				</blockquote>
+				<p>
+					<b>SMART history database path:</b><br />
+					<input type="text" name="smart_history_db_path" value="<?php print(htmlspecialchars($smart_history_db_path)); ?>" placeholder="<?php print(SMART_HISTORY_DB_DEFAULT); ?>" style="width: 95%;" />
+				</p>
+				<blockquote class="inline_help" style="white-space: wrap;">
+					Leave blank to use the default location on the flash drive (<?php print(SMART_HISTORY_DB_DEFAULT); ?>). Flash keeps this data durable independent of array/cache state, matching where the rest of this plugin's config already lives; only change this if you have a specific reason to store it elsewhere.
+					<br />
+				</blockquote>
+				<p>
+					<b>SMART history retention:</b><br />
+					<input type="number" required min="0" max="99" step="1" name="smart_history_retention_years" value="<?php print($smart_history_retention_years); ?>" style="width: 50px;" /> years
+				</p>
+				<blockquote class="inline_help" style="white-space: wrap;">
+					Automatically prune SMART history rows older than this many years, on each completed full SMART scan. 0 disables pruning and keeps history forever.
+					<br />
+				</blockquote>
 			</td>
 			<td style="padding-left: 25px; vertical-align: top;">
 				<h2 style="<?php print($unraid_version_720 ? "margin: 0;" : null) ?> padding-bottom: 25px;">Visible Frontpage Information</h2>
