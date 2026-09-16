@@ -19,11 +19,11 @@ a set of planned improvements within that architecture:
 - [x] Drive type icons (HDD/SSD/NVMe) and an optional manufacturer logo framework
       (auto-detect + manual override, including hotlinking a manufacturer-hosted URL) -
       no logos shipped in-repo; see `disklocation/pages/styles/manufacturers/README.md`
-- [ ] SMART history graphing - currently blocked on the fact that no history is
-      retained at all today (`cronjob.php` overwrites one config file on every scan).
-      Needs its own short design pass before implementation: what to store, at what
-      granularity, how it gets pruned so it doesn't grow forever, and how existing
-      installs (starting from zero history) experience it
+- [x] SMART history graphing - new purpose-built SQLite time series (temp, power-on
+      hours, sector counts, wear level, overall status), one row per device per
+      completed full SMART scan, with configurable retention/pruning, plus a new
+      "Trends" tab charting it with Chart.js. Ships in two parts: storage/cron/pruning,
+      then the charting UI once real data existed to look at
 - [ ] Split the monolithic files (`functions.php`, `cronjob.php`, `page_config.php`,
       `page_system.php`, etc.) into focused modules. Deliberately last: it's an
       internal-only change with no user-facing benefit and real regression risk (no
