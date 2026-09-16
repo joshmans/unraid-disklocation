@@ -442,8 +442,8 @@
 										$temp_status_icon $insert_break
 										$drive_brand_logo
 									</div>
-									<div class=\"flex-container-middle_" . $disk_tray_direction . "\">
-										<span style=\"float: right; margin: 0 0 6px 6px; writing-mode: horizontal-tb;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";\">
+										<span style=\"position: absolute; top: 0; right: 0;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>

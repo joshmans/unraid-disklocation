@@ -1292,8 +1292,9 @@
 		// Reuses the same $rotation convention as get_smart_rotation(): -2 = NVMe SSD,
 		// -1 = SATA/SAS SSD, 0/null = unknown, positive = HDD at that RPM. Returns an
 		// inline SVG (rather than a font-icon class) so it renders identically regardless
-		// of which icon font Unraid's webGUI happens to bundle, wrapped in the same
-		// 'info' tooltip pattern used by the other tray status icons (see devices.php).
+		// of which icon font Unraid's webGUI happens to bundle. Uses a plain native
+		// title="" tooltip rather than the '.info' class the other tray status icons use -
+		// see the note at the return statement below for why.
 		//
 		// These are original filled glyphs (not any vendor/manufacturer/org logo - that
 		// kind of artwork is trademarked and we deliberately don't reproduce it here, see
@@ -1301,15 +1302,19 @@
 		// tile backgrounds rather than blend into the surrounding text the way a
 		// currentColor outline did.
 		//
-		// Rendered at 28x28 (up from the original 13x13) and placed by devices.php as a
-		// float:right inside the device-info column (.flex-container-middle_*), next to
-		// the tray title - not inline in the <br />-stacked status-icon column with the
-		// ~13-16px orbs (too small there once filled/colored) and not an absolutely
-		// positioned corner badge on the tray tile div either (that needed `position:
-		// relative` on the shared tile div, which changed the containing block - and so
-		// the on-hover position - of every other icon's '.info' tooltip span in that
-		// tile, not just this one). float doesn't establish a new containing block for
-		// descendants, so this placement can't have that side effect.
+		// Rendered at 28x28 (up from the original 13x13) and placed by devices.php as an
+		// absolutely positioned badge inside the device-info column
+		// (.flex-container-middle_*), top-right next to the tray title - not inline in
+		// the <br />-stacked status-icon column with the ~13-16px orbs (too small there
+		// once filled/colored). `position: relative` for this is scoped to that
+		// device-info column specifically, not the shared tray tile div - putting it
+		// there instead changed the containing block (and so the on-hover position) of
+		// every other icon's '.info' tooltip span in that tile, not just this one's.
+		// devices.php also sets min-width: 0 and overflow-wrap: break-word on that same
+		// column: without them, an unbreakable run of text (e.g. a serial number) plus
+		// this icon's reserved width can together exceed a narrow tray's available space,
+		// and the column - along with this icon anchored to its edge - renders outside
+		// the tray tile's visible bounds instead of shrinking/wrapping to fit.
 		//
 		// Colors are deliberately outside the red/yellow/green/grey already used by the
 		// temp/SMART status orbs, so it can't be misread as a status.
@@ -1329,7 +1334,13 @@
 			default: // unknown - don't show an icon at all, consistent with the other status icons when data is unavailable
 				return "";
 		}
-		return "<a class='info' style=\"margin: 0;\"><span style=\"display: inline-block; vertical-align: middle;\">" . $svg . "</span><span>Drive type: " . $label . "</span></a>";
+		// Deliberately a plain native title="" tooltip, not Unraid's own '.info' class (the
+		// pattern every other tray status icon uses). That pattern misbehaved - on-hover
+		// jumping - once this icon moved out of the status-icon column into the device-info
+		// column, in a way this project can't debug further without visibility into
+		// Unraid's own core tooltip JS/CSS (not part of this plugin/repo). A native
+		// tooltip is fully browser-standard and can't have that failure mode.
+		return "<span title=\"Drive type: " . htmlspecialchars($label) . "\" style=\"display: inline-block; vertical-align: middle;\">" . $svg . "</span>";
 	}
 	
 	function get_smart_rotation($input) {
