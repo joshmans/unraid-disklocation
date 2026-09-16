@@ -431,45 +431,57 @@
 						$add_anim_bg_class = "class=\"red-blink-disklocation-bg\"";
 					}
 					
-					// Horizontal trays get the icon as a bottom-right badge in the device-info
-					// column, with reserved space (padding-right) and shrink/wrap allowances
-					// (min-width/overflow-wrap) so a long unbreakable string like a serial
-					// number can't push it out of the tile - see get_drive_type_icon()'s
-					// comment for why those are needed.
+					// Horizontal trays get the icon+text chip as a bottom-right badge in the
+					// device-info column, with reserved space (padding-right, sized to the
+					// chip's own rendered width) and shrink/wrap allowances (min-width/
+					// overflow-wrap) so a long unbreakable string like a serial number can't
+					// push it out of the tile - see get_drive_type_icon()'s comment for why
+					// those are needed.
 					//
-					// Vertical trays get the same badge, bottom-left and rotated 90deg to match
+					// Vertical trays get the same chip, bottom-left and rotated 90deg to match
 					// .flex-container-middle_v's own writing-mode: vertical-rl text. That column
-					// needs its own fix first though: with no explicit height, vertical-rl
-					// content has no block-size limit to wrap additional columns against, so it
-					// grows one tall column indefinitely and overflows the tile's bottom edge
-					// once there's enough device-info text - confirmed by measuring actual
-					// rendered layout, independent of this icon entirely. flex: 1 1 0 (basis
-					// zero, so the flex algorithm - not content size - drives it) plus
-					// min-height: 0 (so it can actually shrink to that computed size instead of
-					// refusing to go below its content's own intrinsic height, the default)
-					// gives it a real height constraint to wrap against, mirroring the
-					// analogous min-width: 0 fix for the horizontal case's width axis.
+					// needs two fixes of its own first though, both confirmed by measuring
+					// actual rendered layout rather than trusting a screenshot (which had missed
+					// smaller versions of both issues before):
+					//   - With no explicit height, vertical-rl content has no block-size limit to
+					//     wrap additional columns against, so it grows one tall column
+					//     indefinitely and overflows the tile's bottom edge once there's enough
+					//     device-info text. flex: 1 1 0 (basis zero, so the flex algorithm - not
+					//     content size - drives it) plus min-height: 0 (so it can actually shrink
+					//     to that computed size instead of refusing to go below its content's own
+					//     intrinsic height, the default) gives it a real height constraint to wrap
+					//     against, mirroring the analogous min-width: 0 fix for the horizontal
+					//     case's width axis.
+					//   - Even with that column height constraint, a single unbreakable token
+					//     (e.g. a model string with no spaces, like the serial-heavy ones this
+					//     plugin actually renders) still isn't split by a column boundary, so it
+					//     overflows past the tile's bottom edge on its own - the same failure mode
+					//     the horizontal case already needed overflow-wrap: break-word for,
+					//     mirrored here onto the vertical column.
 					// flex-shrink: 0 on .flex-container-start keeps the tray-number/status-icon
 					// row from being squeezed in exchange - it should stay at its natural size
 					// while the device-info column is the one that adapts.
 					//
-					// The badge's rotation relies on the default (center) transform-origin: an
+					// The chip's rotation relies on the default (center) transform-origin: an
 					// earlier attempt set transform-origin to the same corner as the position
 					// anchor (bottom left), which swings a 90deg-rotated box to the *opposite*
 					// side of its pivot rather than rotating in place, pushing it outside the
-					// tile. Rotating a (near-)square element around its own center keeps its
-					// bounding box unchanged, so anchoring via bottom/left and rotating around
-					// center compose safely - confirmed by direct measurement, not just how it
-					// looked in a screenshot, which had missed a smaller version of this same
-					// issue once already.
+					// tile. Rotating around the chip's own center instead keeps it centered on
+					// that same point, so anchoring via bottom/left and rotating around center
+					// compose safely - the chip is wider than it is tall (icon + text label, not
+					// a square glyph), so the rotated footprint is taller than the chip's own
+					// unrotated height, but .flex-container-middle_v's own bottom padding (see
+					// disk.css.php) gives it enough clearance. Confirmed by direct measurement of
+					// the rotated chip's actual bounding box against the tile's, not just how it
+					// looked in a screenshot.
 					if($disk_tray_direction == "v") {
 						$drive_type_icon_start_style = "flex-shrink: 0;";
-						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; position: relative;";
+						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; overflow-wrap: break-word; position: relative;";
 						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; left: 0; transform: rotate(90deg);\">$drive_type_icon</span>";
 					}
 					else {
 						$drive_type_icon_start_style = "";
-						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";";
+						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "52px" : "0" ) . ";";
 						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>";
 					}
 					

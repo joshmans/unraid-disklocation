@@ -1302,33 +1302,44 @@
 		// tile backgrounds rather than blend into the surrounding text the way a
 		// currentColor outline did.
 		//
-		// Rendered at 28x28 (up from the original 13x13) and placed by devices.php as an
-		// absolutely positioned badge inside the device-info column
-		// (.flex-container-middle_*), top-right next to the tray title - not inline in
-		// the <br />-stacked status-icon column with the ~13-16px orbs (too small there
-		// once filled/colored). `position: relative` for this is scoped to that
+		// A bare glyph (even a colorful one) still needed a hover to say what it meant, so
+		// this renders as a small chip - glyph plus a short text label ("M.2"/"SSD"/"HDD")
+		// side by side - so the type reads at a glance without hovering. The tooltip stays
+		// as a fallback with the fuller label (e.g. "NVMe SSD", "7200 RPM").
+		//
+		// Placed by devices.php as an absolutely positioned badge inside the device-info
+		// column (.flex-container-middle_*), bottom-right (horizontal trays) or
+		// bottom-left+rotated (vertical trays) - not inline in the <br />-stacked
+		// status-icon column with the ~13-16px orbs (too small there once filled/colored
+		// with a text label attached). `position: relative` for this is scoped to that
 		// device-info column specifically, not the shared tray tile div - putting it
 		// there instead changed the containing block (and so the on-hover position) of
 		// every other icon's '.info' tooltip span in that tile, not just this one's.
 		// devices.php also sets min-width: 0 and overflow-wrap: break-word on that same
 		// column: without them, an unbreakable run of text (e.g. a serial number) plus
-		// this icon's reserved width can together exceed a narrow tray's available space,
-		// and the column - along with this icon anchored to its edge - renders outside
+		// this chip's reserved width can together exceed a narrow tray's available space,
+		// and the column - along with this chip anchored to its edge - renders outside
 		// the tray tile's visible bounds instead of shrinking/wrapping to fit.
 		//
 		// Colors are deliberately outside the red/yellow/green/grey already used by the
 		// temp/SMART status orbs, so it can't be misread as a status.
 		switch(true) {
-			case ($rotation == -2): // NVMe - stylized M.2 stick: body, two chips, four contact pins
-				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='9' width='28' height='14' rx='2' fill='#2196F3'/><rect x='6' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='17' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='6' y='23' width='3' height='4' fill='#2196F3'/><rect x='11' y='23' width='3' height='4' fill='#2196F3'/><rect x='16' y='23' width='3' height='4' fill='#2196F3'/><rect x='21' y='23' width='3' height='4' fill='#2196F3'/></svg>";
+			case ($rotation == -2): // NVMe - stylized M.2 stick (white body, blue chips) + "M.2" text
+				$glyph = "<svg viewBox='0 0 32 32' width='14' height='14' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='9' width='28' height='14' rx='2' fill='#fff'/><rect x='6' y='13' width='8' height='6' rx='1' fill='#1565C0'/><rect x='17' y='13' width='8' height='6' rx='1' fill='#1565C0'/></svg>";
+				$short_label = "M.2";
+				$chip_bg = "rgba(21,101,192,0.92)";
 				$label = "NVMe SSD";
 				break;
-			case ($rotation == -1): // SATA/SAS SSD - drive casing with corner screws and a label strip
-				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='3' width='28' height='24' rx='2' fill='#26A69A'/><circle cx='5.5' cy='6.5' r='1' fill='#004D40'/><circle cx='26.5' cy='6.5' r='1' fill='#004D40'/><circle cx='5.5' cy='23.5' r='1' fill='#004D40'/><circle cx='26.5' cy='23.5' r='1' fill='#004D40'/><rect x='7' y='9' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='14' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='19' width='12' height='2.5' rx='1' fill='#B2DFDB'/></svg>";
+			case ($rotation == -1): // SATA/SAS SSD - drive casing (white body, teal chips) + "SSD" text
+				$glyph = "<svg viewBox='0 0 32 32' width='14' height='14' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='4' width='28' height='24' rx='3' fill='#fff'/><rect x='7' y='11' width='7' height='7' rx='1' fill='#00796B'/><rect x='18' y='11' width='7' height='7' rx='1' fill='#00796B'/></svg>";
+				$short_label = "SSD";
+				$chip_bg = "rgba(0,121,107,0.92)";
 				$label = "SSD";
 				break;
-			case (!empty($rotation) && $rotation > 0): // HDD - drive casing with a spinning-platter ring motif
-				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='4' width='28' height='24' rx='3' fill='#78909C'/><circle cx='16' cy='15' r='7' fill='none' stroke='#CFD8DC' stroke-width='2'/><circle cx='16' cy='15' r='2.5' fill='#CFD8DC'/><rect x='7' y='24' width='18' height='2.5' rx='1' fill='#CFD8DC'/></svg>";
+			case (!empty($rotation) && $rotation > 0): // HDD - spinning platter (white disc, slate hub) + "HDD" text
+				$glyph = "<svg viewBox='0 0 32 32' width='14' height='14' xmlns='http://www.w3.org/2000/svg'><circle cx='16' cy='16' r='13' fill='#fff'/><circle cx='16' cy='16' r='5' fill='#455A64'/></svg>";
+				$short_label = "HDD";
+				$chip_bg = "rgba(69,90,100,0.92)";
 				$label = $rotation . " RPM";
 				break;
 			default: // unknown - don't show an icon at all, consistent with the other status icons when data is unavailable
@@ -1340,13 +1351,11 @@
 		// column, in a way this project can't debug further without visibility into
 		// Unraid's own core tooltip JS/CSS (not part of this plugin/repo). A native
 		// tooltip is fully browser-standard and can't have that failure mode.
-		// A neutral, near-opaque badge behind the icon, rather than relying on the icon's
-		// own fill colors for contrast: tray tile background color is admin-configurable
-		// (see bgcolor_* settings) and several of this icon's own colors (e.g. NVMe's
-		// blue) can end up close to a tile's own background color by coincidence, making
-		// the icon hard to see without this. White reads clearly against every color in
-		// the existing tile palette (all fairly dark/muted tones).
-		return "<span title=\"Drive type: " . htmlspecialchars($label) . "\" style=\"display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.85); border-radius: 4px; padding: 2px; vertical-align: middle;\">" . $svg . "</span>";
+		// The chip itself is a solid, saturated color (not relying on translucency over
+		// the tile) with a semi-opaque white outline: tray tile background color is
+		// admin-configurable (see bgcolor_* settings), so the outline is what keeps the
+		// chip legible against every color in the palette, not the fill alone.
+		return "<span title=\"Drive type: " . htmlspecialchars($label) . "\" style=\"display: inline-flex; align-items: center; gap: 3px; border-radius: 4px; padding: 2px 5px 2px 3px; border: 1px solid rgba(255,255,255,0.55); background: " . $chip_bg . "; vertical-align: middle;\">" . $glyph . "<span style=\"font-size: 10px; font-weight: 800; letter-spacing: 0.3px; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.4);\">" . htmlspecialchars($short_label) . "</span></span>";
 	}
 	
 	function get_smart_rotation($input) {
