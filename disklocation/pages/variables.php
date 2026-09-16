@@ -156,7 +156,8 @@
 	}
 	
 	require_once("default_settings.php");
-	
+	require_once("smart_history_db.php");
+
 	if(!file_exists(DISKLOCATION_DEVICES)) { // do not load SQLite anymore if the devices.json exists.
 		$disklocation_new_install = 1;
 		require_once("sqlite_tables.php");

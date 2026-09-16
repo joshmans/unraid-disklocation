@@ -62,7 +62,12 @@
 	
 	//not used, but prepared just in case it will be added in the future:
 	$select_db_devices = "[huge]*pool*[/huge] name node capacity rotation formfactor [color:FFFFFF]*[serial]*[/color]\r\nmanufacturer model\r\ncomment";
-	
+
+//	SMART History settings
+
+	$smart_history_db_path =	'';		// custom path for the SMART history SQLite database, blank = default (flash: SMART_HISTORY_DB_DEFAULT)
+	$smart_history_retention_years = 2;		// prune SMART history rows older than this many years, 0 = keep forever (no pruning)
+
 //	Group settings
 	
 	$group_color = 		'';		// set default group background color to "empty/disabled"

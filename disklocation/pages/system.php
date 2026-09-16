@@ -195,6 +195,9 @@
 		if(!preg_match("/(0|1)/", $_POST["allow_unraid_edit"])) { $disklocation_error[] = "Unraid config edit field is invalid."; }
 		if(!preg_match("/[0-9]{1,4}/", $_POST["serial_trim"])) { $disklocation_error[] = "Serial number trim number invalid."; }
 		if(!preg_match("/[0-9]{1,9}/", $_POST["auto_backup_days"])) { $disklocation_error[] = "Invalid number of days."; }
+		$_POST["smart_history_db_path"] = trim($_POST["smart_history_db_path"]);
+		if(!preg_match("/^(|\/[^\0]*)$/", $_POST["smart_history_db_path"])) { $disklocation_error[] = "SMART history database path invalid, must be blank or an absolute path."; }
+		if(!preg_match("/^[0-9]{1,2}$/", $_POST["smart_history_retention_years"])) { $disklocation_error[] = "SMART history retention value invalid."; }
 		
 		use_stylesheet($_POST["signal_css"]);
 		
