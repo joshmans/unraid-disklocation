@@ -434,18 +434,18 @@
 					$disklocation_page[$gid] .= "
 						<div style=\"order: " . $drive_tray_order[$hash] . "\">
 							<div class=\"flex-container_" . $disk_tray_direction . "\">
-								<div id=\"bg1-" . $device . "\" $add_anim_bg_class style=\"position: relative; background-color: #" . ( !empty($add_anim_bg_class) ? $color_array_blinker : $color_array[$hash] ) . "; width: " . $tray_width . "px; height: " . $tray_height . "px;\">
+								<div id=\"bg1-" . $device . "\" $add_anim_bg_class style=\"background-color: #" . ( !empty($add_anim_bg_class) ? $color_array_blinker : $color_array[$hash] ) . "; width: " . $tray_width . "px; height: " . $tray_height . "px;\">
 									<div class=\"flex-container-start\" style=\"white-space: nowrap;\">
 										<b>$physical_traynumber</b>$insert_break
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
 										$temp_status_icon $insert_break
+										$drive_type_icon $insert_break
 										$drive_brand_logo
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\">
 										" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
-									<div class=\"dl-drive-type-badge\" style=\"position: absolute; bottom: 4px; right: 4px;\">$drive_type_icon</div>
 								</div>
 							</div>
 						</div>
