@@ -469,18 +469,40 @@
 					// earlier attempt set transform-origin to the same corner as the position
 					// anchor (bottom left), which swings a 90deg-rotated box to the *opposite*
 					// side of its pivot rather than rotating in place, pushing it outside the
-					// tile. Rotating around the chip's own center instead keeps it centered on
-					// that same point, so anchoring via bottom/left and rotating around center
-					// compose safely - the chip is wider than it is tall (icon + text label, not
-					// a square glyph), so the rotated footprint is taller than the chip's own
-					// unrotated height, but .flex-container-middle_v's own bottom padding (see
-					// disk.css.php) gives it enough clearance. Confirmed by direct measurement of
-					// the rotated chip's actual bounding box against the tile's, not just how it
-					// looked in a screenshot.
+					// tile (confirmed the same way rotating around the *chip's own* bottom-left
+					// corner also fails, just in the other direction - off the tile's left edge
+					// instead of its bottom, since a -90deg turn around a bottom-left pivot swings
+					// the box up and to the left of that pivot, not up and to the right).
+					// Rotating around the chip's own center instead keeps it centered on that same
+					// point, so anchoring via bottom/left and rotating around center compose
+					// safely for the horizontal axis - but the chip is wider than it is tall (icon
+					// + text label, not a square glyph), so the rotated footprint's bottom edge
+					// still swings down past the "bottom: 0" anchor by roughly (chip width - chip
+					// height) / 2. .flex-container-middle_v's own bottom padding (see
+					// disk.css.php) almost absorbs that, but not quite for the widest labels
+					// ("HDD"/"SSD") - measurement (not just how it looked in a screenshot) showed
+					// a couple of px still spilling past the tile's bottom edge. Anchoring at
+					// bottom: 6px instead of bottom: 0 (rather than adding more padding to
+					// .flex-container-middle_v itself, which wouldn't help - that padding is
+					// inside the same box the anchor is relative to, so the flex algorithm just
+					// gives the text content less room without ever moving the anchor point) gives
+					// the rotated footprint the little bit of extra clearance it needed, confirmed
+					// by re-measuring all three drive types together in a 2x2 grid.
+					//
+					// The chip's wrapping span also needs writing-mode: horizontal-tb explicitly:
+					// it's a child of .flex-container-middle_v, which sets writing-mode:
+					// vertical-rl, and writing-mode is inherited. Without resetting it, the chip's
+					// own content (the icon + text label) is laid out vertical-rl too, before the
+					// transform: rotate(-90deg) is even applied on top of that - the two rotations
+					// (one from the inherited writing-mode, one from the explicit transform)
+					// visually cancelled out, so the chip rendered fully upright instead of
+					// rotated to match the surrounding text, which is how this was first shipped
+					// and reported back as "not rotated at all". Resetting the chip's own
+					// writing-mode makes the transform the only rotation in effect.
 					if($disk_tray_direction == "v") {
 						$drive_type_icon_start_style = "flex-shrink: 0;";
 						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; overflow-wrap: break-word; position: relative;";
-						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; left: 0; transform: rotate(-90deg);\">$drive_type_icon</span>";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 6px; left: 0; writing-mode: horizontal-tb; transform: rotate(-90deg);\">$drive_type_icon</span>";
 					}
 					else {
 						$drive_type_icon_start_style = "";
