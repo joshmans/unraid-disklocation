@@ -1295,19 +1295,23 @@
 		// of which icon font Unraid's webGUI happens to bundle, wrapped in the same
 		// 'info' tooltip pattern used by the other tray status icons (see devices.php).
 		//
-		// These are small original line-art glyphs, not any vendor/manufacturer logo -
-		// vendor logos are trademarked artwork we deliberately don't reproduce here.
+		// These are original filled glyphs (not any vendor/manufacturer/org logo - that
+		// kind of artwork is trademarked and we deliberately don't reproduce it here, see
+		// pages/styles/manufacturers/README.md), sized and colored to actually stand out
+		// against the tray tile backgrounds rather than blend into the surrounding text.
+		// Colors are deliberately outside the red/yellow/green/grey already used by the
+		// temp/SMART status orbs next to this icon, so it can't be misread as a status.
 		switch(true) {
-			case ($rotation == -2): // NVMe
-				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><rect x='1' y='5' width='14' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='1.3'/><rect x='3' y='7' width='8' height='2' fill='currentColor'/><circle cx='13' cy='8' r='0.8' fill='currentColor'/></svg>";
+			case ($rotation == -2): // NVMe - stylized M.2 stick: body, two chips, four contact pins
+				$svg = "<svg viewBox='0 0 32 32' width='30' height='30' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='9' width='28' height='14' rx='2' fill='#2196F3'/><rect x='6' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='17' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='6' y='23' width='3' height='4' fill='#2196F3'/><rect x='11' y='23' width='3' height='4' fill='#2196F3'/><rect x='16' y='23' width='3' height='4' fill='#2196F3'/><rect x='21' y='23' width='3' height='4' fill='#2196F3'/></svg>";
 				$label = "NVMe SSD";
 				break;
-			case ($rotation == -1): // SATA/SAS SSD
-				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><rect x='1.5' y='3' width='13' height='10' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.3'/><rect x='4' y='6.5' width='3' height='3' fill='currentColor'/><rect x='9' y='6.5' width='3' height='3' fill='currentColor'/></svg>";
+			case ($rotation == -1): // SATA/SAS SSD - drive casing with corner screws and a label strip
+				$svg = "<svg viewBox='0 0 32 32' width='30' height='30' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='3' width='28' height='24' rx='2' fill='#26A69A'/><circle cx='5.5' cy='6.5' r='1' fill='#004D40'/><circle cx='26.5' cy='6.5' r='1' fill='#004D40'/><circle cx='5.5' cy='23.5' r='1' fill='#004D40'/><circle cx='26.5' cy='23.5' r='1' fill='#004D40'/><rect x='7' y='9' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='14' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='19' width='12' height='2.5' rx='1' fill='#B2DFDB'/></svg>";
 				$label = "SSD";
 				break;
-			case (!empty($rotation) && $rotation > 0): // HDD
-				$svg = "<svg viewBox='0 0 16 16' width='13' height='13' xmlns='http://www.w3.org/2000/svg'><circle cx='8' cy='8' r='6.5' fill='none' stroke='currentColor' stroke-width='1.3'/><circle cx='8' cy='8' r='1.8' fill='currentColor'/><line x1='8' y1='2.2' x2='8' y2='5.2' stroke='currentColor' stroke-width='1.3'/></svg>";
+			case (!empty($rotation) && $rotation > 0): // HDD - drive casing with a spinning-platter ring motif
+				$svg = "<svg viewBox='0 0 32 32' width='30' height='30' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='4' width='28' height='24' rx='3' fill='#78909C'/><circle cx='16' cy='15' r='7' fill='none' stroke='#CFD8DC' stroke-width='2'/><circle cx='16' cy='15' r='2.5' fill='#CFD8DC'/><rect x='7' y='24' width='18' height='2.5' rx='1' fill='#CFD8DC'/></svg>";
 				$label = $rotation . " RPM";
 				break;
 			default: // unknown - don't show an icon at all, consistent with the other status icons when data is unavailable
