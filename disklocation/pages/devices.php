@@ -440,11 +440,10 @@
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
 										$temp_status_icon $insert_break
-										$drive_type_icon $insert_break
 										$drive_brand_logo
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\">
-										" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+										<span style=\"float: right; margin: 0 0 6px 6px; writing-mode: horizontal-tb;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>

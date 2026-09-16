@@ -1299,25 +1299,31 @@
 		// kind of artwork is trademarked and we deliberately don't reproduce it here, see
 		// pages/styles/manufacturers/README.md), colored to stand out against the tray
 		// tile backgrounds rather than blend into the surrounding text the way a
-		// currentColor outline did. 16x16 (up from the original 13x13) is as large as
-		// this can go while still sitting inline in the same <br />-stacked status-icon
-		// row as the other ~13-16px orbs - a larger corner-badge placement was tried and
-		// reverted, since it needed `position: relative` on the tray tile div, which
-		// changed the containing block (and so the on-hover position) of every other
-		// icon's '.info' tooltip span in that tile, not just this one.
+		// currentColor outline did.
+		//
+		// Rendered at 28x28 (up from the original 13x13) and placed by devices.php as a
+		// float:right inside the device-info column (.flex-container-middle_*), next to
+		// the tray title - not inline in the <br />-stacked status-icon column with the
+		// ~13-16px orbs (too small there once filled/colored) and not an absolutely
+		// positioned corner badge on the tray tile div either (that needed `position:
+		// relative` on the shared tile div, which changed the containing block - and so
+		// the on-hover position - of every other icon's '.info' tooltip span in that
+		// tile, not just this one). float doesn't establish a new containing block for
+		// descendants, so this placement can't have that side effect.
+		//
 		// Colors are deliberately outside the red/yellow/green/grey already used by the
-		// temp/SMART status orbs next to this icon, so it can't be misread as a status.
+		// temp/SMART status orbs, so it can't be misread as a status.
 		switch(true) {
 			case ($rotation == -2): // NVMe - stylized M.2 stick: body, two chips, four contact pins
-				$svg = "<svg viewBox='0 0 32 32' width='16' height='16' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='9' width='28' height='14' rx='2' fill='#2196F3'/><rect x='6' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='17' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='6' y='23' width='3' height='4' fill='#2196F3'/><rect x='11' y='23' width='3' height='4' fill='#2196F3'/><rect x='16' y='23' width='3' height='4' fill='#2196F3'/><rect x='21' y='23' width='3' height='4' fill='#2196F3'/></svg>";
+				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='9' width='28' height='14' rx='2' fill='#2196F3'/><rect x='6' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='17' y='13' width='8' height='6' rx='1' fill='#BBDEFB'/><rect x='6' y='23' width='3' height='4' fill='#2196F3'/><rect x='11' y='23' width='3' height='4' fill='#2196F3'/><rect x='16' y='23' width='3' height='4' fill='#2196F3'/><rect x='21' y='23' width='3' height='4' fill='#2196F3'/></svg>";
 				$label = "NVMe SSD";
 				break;
 			case ($rotation == -1): // SATA/SAS SSD - drive casing with corner screws and a label strip
-				$svg = "<svg viewBox='0 0 32 32' width='16' height='16' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='3' width='28' height='24' rx='2' fill='#26A69A'/><circle cx='5.5' cy='6.5' r='1' fill='#004D40'/><circle cx='26.5' cy='6.5' r='1' fill='#004D40'/><circle cx='5.5' cy='23.5' r='1' fill='#004D40'/><circle cx='26.5' cy='23.5' r='1' fill='#004D40'/><rect x='7' y='9' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='14' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='19' width='12' height='2.5' rx='1' fill='#B2DFDB'/></svg>";
+				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='3' width='28' height='24' rx='2' fill='#26A69A'/><circle cx='5.5' cy='6.5' r='1' fill='#004D40'/><circle cx='26.5' cy='6.5' r='1' fill='#004D40'/><circle cx='5.5' cy='23.5' r='1' fill='#004D40'/><circle cx='26.5' cy='23.5' r='1' fill='#004D40'/><rect x='7' y='9' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='14' width='18' height='2.5' rx='1' fill='#B2DFDB'/><rect x='7' y='19' width='12' height='2.5' rx='1' fill='#B2DFDB'/></svg>";
 				$label = "SSD";
 				break;
 			case (!empty($rotation) && $rotation > 0): // HDD - drive casing with a spinning-platter ring motif
-				$svg = "<svg viewBox='0 0 32 32' width='16' height='16' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='4' width='28' height='24' rx='3' fill='#78909C'/><circle cx='16' cy='15' r='7' fill='none' stroke='#CFD8DC' stroke-width='2'/><circle cx='16' cy='15' r='2.5' fill='#CFD8DC'/><rect x='7' y='24' width='18' height='2.5' rx='1' fill='#CFD8DC'/></svg>";
+				$svg = "<svg viewBox='0 0 32 32' width='28' height='28' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='4' width='28' height='24' rx='3' fill='#78909C'/><circle cx='16' cy='15' r='7' fill='none' stroke='#CFD8DC' stroke-width='2'/><circle cx='16' cy='15' r='2.5' fill='#CFD8DC'/><rect x='7' y='24' width='18' height='2.5' rx='1' fill='#CFD8DC'/></svg>";
 				$label = $rotation . " RPM";
 				break;
 			default: // unknown - don't show an icon at all, consistent with the other status icons when data is unavailable
