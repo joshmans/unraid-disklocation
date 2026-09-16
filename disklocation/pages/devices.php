@@ -160,7 +160,7 @@
 					$debug_log = debug($debug, basename(__FILE__), __LINE__, "tray_assign", $tray_assign);
 					$debug_log = debug($debug, basename(__FILE__), __LINE__, "tray_number", $tray_number);
 					
-					if(isset($displayinfo["tray"]) && empty($displayinfo["hideemptycontents"])) {
+					if(!empty($displayinfo["tray"]) && empty($displayinfo["hideemptycontents"])) {
 						$empty_tray = (!is_numeric($tray_number_override[$tray_assign]) ? 0 : $tray_number_override[$tray_assign]);
 					}
 					else {
@@ -284,8 +284,8 @@
 					$unraid_array_icon = "";
 					$physical_traynumber = null;
 					
-					$drive_type_icon = ( isset($displayinfo["leddrivetype"]) ? get_drive_type_icon($devices[$hash]["raw"]["rotation"] ?? null) : "" );
-					$drive_brand_logo = ( isset($displayinfo["leddrivelogo"]) ? get_drive_brand_logo($devices[$hash]["raw"]["manufacturer"] ?? null, $devices[$hash]["raw"]["model"] ?? null, $devices[$hash]["raw"]["manufacturer_override"] ?? null) : "" );
+					$drive_type_icon = ( !empty($displayinfo["leddrivetype"]) ? get_drive_type_icon($devices[$hash]["raw"]["rotation"] ?? null) : "" );
+					$drive_brand_logo = ( !empty($displayinfo["leddrivelogo"]) ? get_drive_brand_logo($devices[$hash]["raw"]["manufacturer"] ?? null, $devices[$hash]["raw"]["model"] ?? null, $devices[$hash]["raw"]["manufacturer_override"] ?? null) : "" );
 					
 					if(!$unraid_array[$devicenode]["temp"] || !is_numeric($unraid_array[$devicenode]["temp"])) { // && (!$unraid_array[$devicenode]["temp"] && $unraid_array[$devicenode]["hotTemp"] == 0 && $unraid_array[$devicenode]["maxTemp"] == 0)) {
 						$unraid_array[$devicenode]["temp"] = 0;
@@ -311,7 +311,7 @@
 							$temp_status = 3;
 						}
 					}
-					if(!isset($displayinfo["ledtemp"])) {
+					if(empty($displayinfo["ledtemp"])) {
 						$temp_status_icon = "";
 					}
 					
@@ -336,7 +336,7 @@
 							$smart_status_info = array('orb' => 'fa fa-circle orb-disklocation grey-orb-disklocation', 'color' => 'grey', 'text' => 'N/A');
 					}
 					
-					if(isset($displayinfo["leddiskop"])) {
+					if(!empty($displayinfo["leddiskop"])) {
 						$zfs_disk_status = "";
 						if($zfs_check) {
 							$zfs_disk_status = zfs_disk($data["smart_serialnumber"], $zfs_parser, $lsblk_array);
@@ -374,7 +374,7 @@
 					
 					$drive_tray_order[$hash] = ( !isset($drive_tray_order[$hash]) ? $tray_assign : $drive_tray_order[$hash] );
 					
-					if(isset($displayinfo["tray"])) {
+					if(!empty($displayinfo["tray"])) {
 						$physical_traynumber = (!is_numeric($tray_number_override[$drive_tray_order[$hash]]) ? 0 : $tray_number_override[$drive_tray_order[$hash]]);
 					}
 					else {
@@ -422,11 +422,11 @@
 					
 					$add_anim_bg_class = "";
 					$color_array_blinker = "";
-					if(isset($displayinfo["flashwarning"]) && ($temp_status == 2 || $smart_status == 2 || $color_status == "yellow")) { // warning
+					if(!empty($displayinfo["flashwarning"]) && ($temp_status == 2 || $smart_status == 2 || $color_status == "yellow")) { // warning
 						$color_array_blinker = "blinker-disklocation-yellow-bg";
 						$add_anim_bg_class = "class=\"yellow-blink-disklocation-bg\"";
 					}
-					if(isset($displayinfo["flashcritical"]) && ($temp_status == 3 || !$smart_status || $color_status == "red")) { // critical
+					if(!empty($displayinfo["flashcritical"]) && ($temp_status == 3 || !$smart_status || $color_status == "red")) { // critical
 						$color_array_blinker = "blinker-disklocation-red-bg";
 						$add_anim_bg_class = "class=\"red-blink-disklocation-bg\"";
 					}
