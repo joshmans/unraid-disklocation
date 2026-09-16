@@ -1340,7 +1340,13 @@
 		// column, in a way this project can't debug further without visibility into
 		// Unraid's own core tooltip JS/CSS (not part of this plugin/repo). A native
 		// tooltip is fully browser-standard and can't have that failure mode.
-		return "<span title=\"Drive type: " . htmlspecialchars($label) . "\" style=\"display: inline-block; vertical-align: middle;\">" . $svg . "</span>";
+		// A neutral, near-opaque badge behind the icon, rather than relying on the icon's
+		// own fill colors for contrast: tray tile background color is admin-configurable
+		// (see bgcolor_* settings) and several of this icon's own colors (e.g. NVMe's
+		// blue) can end up close to a tile's own background color by coincidence, making
+		// the icon hard to see without this. White reads clearly against every color in
+		// the existing tile palette (all fairly dark/muted tones).
+		return "<span title=\"Drive type: " . htmlspecialchars($label) . "\" style=\"display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.85); border-radius: 4px; padding: 2px; vertical-align: middle;\">" . $svg . "</span>";
 	}
 	
 	function get_smart_rotation($input) {

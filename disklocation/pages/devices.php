@@ -443,7 +443,7 @@
 										$drive_brand_logo
 									</div>
 									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "34px" : "0" ) . ";\">
-										<span style=\"position: absolute; top: 0; right: 0;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+										<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>
