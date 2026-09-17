@@ -5,7 +5,7 @@ the current PHP codebase, putting it into maintenance mode, and eventually rebui
 Unraid's modern plugin architecture. It's a living document - phases and their contents
 may shift as work progresses and priorities change.
 
-## Phase 1: Finish out the current PHP codebase (in progress)
+## Phase 1: Finish out the current PHP codebase (complete)
 
 The plugin's existing architecture (classic Unraid webGUI plugin, PHP, SQLite/flat-file
 config) is stable and well-understood. Before starting anything new, we're finishing out
@@ -24,15 +24,21 @@ a set of planned improvements within that architecture:
       completed full SMART scan, with configurable retention/pruning, plus a new
       "Trends" tab charting it with Chart.js. Ships in two parts: storage/cron/pruning,
       then the charting UI once real data existed to look at
-- [ ] Split the monolithic files (`functions.php`, `cronjob.php`, `page_config.php`,
-      `page_system.php`, etc.) into focused modules. Deliberately last: it's an
-      internal-only change with no user-facing benefit and real regression risk (no
-      live Unraid instance in this workflow to catch mistakes), so it makes more sense
-      to refactor the code once its shape has settled from the items above, rather than
-      refactor a moving target and then have to redo part of it anyway
+- [x] Split the monolithic files. `functions.php`'s 49-function grab-bag became six
+      topic-focused files (`functions_core.php`, `functions_export.php`,
+      `functions_smart.php`, `functions_zfs.php`, `functions_devices.php`,
+      `functions_drive_brand.php`) behind a thin loader; `page_system.php`'s six
+      backup/restore functions moved to `functions_backup.php`. `cronjob.php` and
+      `page_config.php` were reviewed but left as-is - both are already single-purpose
+      scripts, not grab-bags, so splitting either would have been unnecessary
+      fragmentation rather than the focused modules this item was after. Pure move, no
+      logic changes - verified by diffing extracted function bodies byte-for-byte
+      against git history, and confirmed on real hardware after catching (and fixing) a
+      function-hoisting-order regression that `php -l` alone couldn't catch, since it
+      only checks syntax, not execution
 
-Once everything above lands, the PHP codebase is considered feature-complete for its
-architecture.
+Everything above has landed - the PHP codebase is feature-complete for its architecture.
+Phase 2 (maintenance mode) begins now.
 
 ## Phase 2: PHP version enters maintenance mode
 
