@@ -431,26 +431,113 @@
 						$add_anim_bg_class = "class=\"red-blink-disklocation-bg\"";
 					}
 					
+					// Horizontal trays get the icon+text chip as a bottom-right badge in the
+					// device-info column, with reserved space (padding-right, sized to the
+					// chip's own rendered width) and shrink/wrap allowances (min-width/
+					// overflow-wrap) so a long unbreakable string like a serial number can't
+					// push it out of the tile - see get_drive_type_icon()'s comment for why
+					// those are needed.
+					//
+					// Vertical trays get the same chip, bottom-left and rotated 90deg to match
+					// .flex-container-middle_v's own writing-mode: vertical-rl text. Confirmed by
+					// measuring actual character positions (via Range.getBoundingClientRect() on
+					// each character), not by eyeballing a screenshot or reasoning about which way
+					// rotate() "should" go - that reasoning gave the wrong sign once already here
+					// (see the writing-mode note below for why a quick visual check of rotation
+					// direction in isolation, outside this specific inherited-writing-mode
+					// context, isn't reliable evidence). That column needs two fixes of its own
+					// first though, both confirmed by measuring actual rendered layout rather than
+					// trusting a screenshot (which had missed smaller versions of both issues
+					// before):
+					//   - With no explicit height, vertical-rl content has no block-size limit to
+					//     wrap additional columns against, so it grows one tall column
+					//     indefinitely and overflows the tile's bottom edge once there's enough
+					//     device-info text. flex: 1 1 0 (basis zero, so the flex algorithm - not
+					//     content size - drives it) plus min-height: 0 (so it can actually shrink
+					//     to that computed size instead of refusing to go below its content's own
+					//     intrinsic height, the default) gives it a real height constraint to wrap
+					//     against, mirroring the analogous min-width: 0 fix for the horizontal
+					//     case's width axis.
+					//   - Even with that column height constraint, a single unbreakable token
+					//     (e.g. a model string with no spaces, like the serial-heavy ones this
+					//     plugin actually renders) still isn't split by a column boundary, so it
+					//     overflows past the tile's bottom edge on its own - the same failure mode
+					//     the horizontal case already needed overflow-wrap: break-word for,
+					//     mirrored here onto the vertical column.
+					// flex-shrink: 0 on .flex-container-start keeps the tray-number/status-icon
+					// row from being squeezed in exchange - it should stay at its natural size
+					// while the device-info column is the one that adapts.
+					//
+					// The chip's rotation relies on the default (center) transform-origin: an
+					// earlier attempt set transform-origin to the same corner as the position
+					// anchor (bottom left), which swings a 90deg-rotated box to the *opposite*
+					// side of its pivot rather than rotating in place, pushing it outside the
+					// tile. Rotating around the chip's own center instead keeps it centered on
+					// that same point, so anchoring via bottom/left and rotating around center
+					// compose safely for the horizontal axis - but the chip is wider than it is
+					// tall (icon + text label, not a square glyph), so the rotated footprint's
+					// bottom edge still swings down past the "bottom: 0" anchor by roughly (chip
+					// width - chip height) / 2. .flex-container-middle_v's own bottom padding (see
+					// disk.css.php) almost absorbs that, but not quite for the widest labels
+					// ("HDD"/"SSD") - measurement (not just how it looked in a screenshot) showed
+					// a couple of px still spilling past the tile's bottom edge. Anchoring at
+					// bottom: 6px instead of bottom: 0 (rather than adding more padding to
+					// .flex-container-middle_v itself, which wouldn't help - that padding is
+					// inside the same box the anchor is relative to, so the flex algorithm just
+					// gives the text content less room without ever moving the anchor point) gives
+					// the rotated footprint the little bit of extra clearance it needed, confirmed
+					// by re-measuring all three drive types together in a 2x2 grid.
+					//
+					// The chip's wrapping span also needs writing-mode: horizontal-tb explicitly:
+					// it's a child of .flex-container-middle_v, which sets writing-mode:
+					// vertical-rl, and writing-mode is inherited. Without resetting it, the chip's
+					// own content (the icon + text label) is laid out vertical-rl too, before the
+					// transform: rotate() is even applied on top of that - the two rotations (one
+					// from the inherited writing-mode, one from the explicit transform) visually
+					// cancelled out, so the chip rendered fully upright instead of rotated to match
+					// the surrounding text, which is how this was first shipped and reported back
+					// as "not rotated at all". Resetting the chip's own writing-mode makes the
+					// transform the only rotation in effect - and also means a rotation direction
+					// (clockwise vs counter-clockwise) sanity-checked against an *isolated* element
+					// with no inherited vertical-rl doesn't actually predict the right sign here:
+					// that same inherited writing-mode that caused the "not rotated at all" bug
+					// also flips which transform sign visually matches the real (inherited-
+					// vertical-rl) text next to it. Only measuring actual character positions in
+					// this exact context - both the real device-info text and the chip's own label
+					// - settled it: rotate(90deg) is what actually matches, confirmed by
+					// Range.getBoundingClientRect() on each character showing the same
+					// top-to-bottom reading order in both, not by re-deriving it from first
+					// principles (which gave the wrong sign here once already).
+					if($disk_tray_direction == "v") {
+						$drive_type_icon_start_style = "flex-shrink: 0;";
+						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; overflow-wrap: break-word; position: relative;";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 6px; left: 0; writing-mode: horizontal-tb; transform: rotate(90deg);\">$drive_type_icon</span>";
+					}
+					else {
+						$drive_type_icon_start_style = "";
+						$drive_type_icon_column_style = "position: relative; min-width: 0; overflow-wrap: break-word; padding-right: " . ( !empty($drive_type_icon) ? "52px" : "0" ) . ";";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 0; right: 0;\">$drive_type_icon</span>";
+					}
+					
 					$disklocation_page[$gid] .= "
 						<div style=\"order: " . $drive_tray_order[$hash] . "\">
 							<div class=\"flex-container_" . $disk_tray_direction . "\">
 								<div id=\"bg1-" . $device . "\" $add_anim_bg_class style=\"background-color: #" . ( !empty($add_anim_bg_class) ? $color_array_blinker : $color_array[$hash] ) . "; width: " . $tray_width . "px; height: " . $tray_height . "px;\">
-									<div class=\"flex-container-start\" style=\"white-space: nowrap;\">
+									<div class=\"flex-container-start\" style=\"white-space: nowrap; $drive_type_icon_start_style\">
 										<b>$physical_traynumber</b>$insert_break
 										$unraid_array_icon $insert_break
 										$smart_status_icon $insert_break
 										$temp_status_icon $insert_break
-										$drive_type_icon $insert_break
 										$drive_brand_logo
 									</div>
-									<div class=\"flex-container-middle_" . $disk_tray_direction . "\">
-										" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
+									<div class=\"flex-container-middle_" . $disk_tray_direction . "\" style=\"$drive_type_icon_column_style\">
+										$drive_type_icon_middle_html" . bscode2html(nl2br(stripslashes(htmlspecialchars(keys_to_content($select_db_devices_str, $devices[$hash]["formatted"]))))) . "
 									</div>
 								</div>
 							</div>
 						</div>
 					";
-					
+
 					$add_physical_tray_order = "";
 					if($drive_tray_order[$hash] != $physical_traynumber) {
 						$add_physical_tray_order = $drive_tray_order[$hash];
