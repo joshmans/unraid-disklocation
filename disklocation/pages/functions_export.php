@@ -21,6 +21,7 @@
 	 *  ROADMAP.md) along with the other functions_*.php files - no logic changed.
 	 */
 	
+	// function from: https://stackoverflow.com/questions/16251625/how-to-create-and-download-a-csv-file-from-php-script
 	function array_to_csv_download($array, $filename = "output.tsv", $delimiter="\t") {
 		// open raw memory as file so no temp files needed, you might run out of memory though
 		$f = fopen('php://memory', 'w'); 

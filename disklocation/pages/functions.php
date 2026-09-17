@@ -24,12 +24,18 @@
 	 *  body against this file's pre-split git history. Kept as the single entry point
 	 *  every other file already does require_once("functions.php") for, so nothing else
 	 *  needed to change.
+	 *
+	 *  The functions_*.php requires have to come BEFORE variables.php/load_settings.php,
+	 *  not after: variables.php calls debug() at its own top level (not inside a
+	 *  function), which used to work because PHP hoists every unconditional top-level
+	 *  function declared anywhere in a file - even one appearing later in the same file -
+	 *  before that file's own first line executes. That's a per-file guarantee, not a
+	 *  per-require-chain one: with debug() moved out to functions_core.php, it only
+	 *  exists once that require actually runs, so functions_core.php (and the rest) have
+	 *  to run first. Confirmed by actually executing this require chain (not just
+	 *  php -l, which only checks syntax) - it failed with "Call to undefined function
+	 *  debug()" from variables.php when the requires were in the other order.
 	 */
-
-	if(!strstr($_SERVER["SCRIPT_NAME"], "page_system.php")) {
-		require_once("variables.php");
-		include("load_settings.php");
-	}
 
 	require_once("functions_core.php");
 	require_once("functions_export.php");
@@ -37,4 +43,9 @@
 	require_once("functions_zfs.php");
 	require_once("functions_devices.php");
 	require_once("functions_drive_brand.php");
+
+	if(!strstr($_SERVER["SCRIPT_NAME"], "page_system.php")) {
+		require_once("variables.php");
+		include("load_settings.php");
+	}
 ?>

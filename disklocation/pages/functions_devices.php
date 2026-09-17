@@ -275,6 +275,7 @@
 		}
 	}
 	
+	// lsscsi -bg
 	function lsscsi_parser($input) {
 		// \[(.+:.+:.+:.+)\]\s+(-|(\/dev\/(h|s)d[a-z]{1,})?)\s+((\/dev\/(nvme|sg)[0-9]{1,})(n[0-9]{1,})?)
 		$pattern_device = "\[(.+:.+:.+:.+)\]\s+";						// $1
