@@ -438,14 +438,17 @@
 					// push it out of the tile - see get_drive_type_icon()'s comment for why
 					// those are needed.
 					//
-					// Vertical trays get the same chip, bottom-left and rotated -90deg to match
-					// .flex-container-middle_v's own writing-mode: vertical-rl text (confirmed by
-					// rendering plain text both ways and comparing - vertical-rl/sideways text
-					// rotates counter-clockwise, not clockwise, so this needs -90deg and not the
-					// +90deg it's easy to assume from "rotated 90deg"). That column
-					// needs two fixes of its own first though, both confirmed by measuring
-					// actual rendered layout rather than trusting a screenshot (which had missed
-					// smaller versions of both issues before):
+					// Vertical trays get the same chip, bottom-left and rotated 90deg to match
+					// .flex-container-middle_v's own writing-mode: vertical-rl text. Confirmed by
+					// measuring actual character positions (via Range.getBoundingClientRect() on
+					// each character), not by eyeballing a screenshot or reasoning about which way
+					// rotate() "should" go - that reasoning gave the wrong sign once already here
+					// (see the writing-mode note below for why a quick visual check of rotation
+					// direction in isolation, outside this specific inherited-writing-mode
+					// context, isn't reliable evidence). That column needs two fixes of its own
+					// first though, both confirmed by measuring actual rendered layout rather than
+					// trusting a screenshot (which had missed smaller versions of both issues
+					// before):
 					//   - With no explicit height, vertical-rl content has no block-size limit to
 					//     wrap additional columns against, so it grows one tall column
 					//     indefinitely and overflows the tile's bottom edge once there's enough
@@ -469,16 +472,12 @@
 					// earlier attempt set transform-origin to the same corner as the position
 					// anchor (bottom left), which swings a 90deg-rotated box to the *opposite*
 					// side of its pivot rather than rotating in place, pushing it outside the
-					// tile (confirmed the same way rotating around the *chip's own* bottom-left
-					// corner also fails, just in the other direction - off the tile's left edge
-					// instead of its bottom, since a -90deg turn around a bottom-left pivot swings
-					// the box up and to the left of that pivot, not up and to the right).
-					// Rotating around the chip's own center instead keeps it centered on that same
-					// point, so anchoring via bottom/left and rotating around center compose
-					// safely for the horizontal axis - but the chip is wider than it is tall (icon
-					// + text label, not a square glyph), so the rotated footprint's bottom edge
-					// still swings down past the "bottom: 0" anchor by roughly (chip width - chip
-					// height) / 2. .flex-container-middle_v's own bottom padding (see
+					// tile. Rotating around the chip's own center instead keeps it centered on
+					// that same point, so anchoring via bottom/left and rotating around center
+					// compose safely for the horizontal axis - but the chip is wider than it is
+					// tall (icon + text label, not a square glyph), so the rotated footprint's
+					// bottom edge still swings down past the "bottom: 0" anchor by roughly (chip
+					// width - chip height) / 2. .flex-container-middle_v's own bottom padding (see
 					// disk.css.php) almost absorbs that, but not quite for the widest labels
 					// ("HDD"/"SSD") - measurement (not just how it looked in a screenshot) showed
 					// a couple of px still spilling past the tile's bottom edge. Anchoring at
@@ -493,16 +492,26 @@
 					// it's a child of .flex-container-middle_v, which sets writing-mode:
 					// vertical-rl, and writing-mode is inherited. Without resetting it, the chip's
 					// own content (the icon + text label) is laid out vertical-rl too, before the
-					// transform: rotate(-90deg) is even applied on top of that - the two rotations
-					// (one from the inherited writing-mode, one from the explicit transform)
-					// visually cancelled out, so the chip rendered fully upright instead of
-					// rotated to match the surrounding text, which is how this was first shipped
-					// and reported back as "not rotated at all". Resetting the chip's own
-					// writing-mode makes the transform the only rotation in effect.
+					// transform: rotate() is even applied on top of that - the two rotations (one
+					// from the inherited writing-mode, one from the explicit transform) visually
+					// cancelled out, so the chip rendered fully upright instead of rotated to match
+					// the surrounding text, which is how this was first shipped and reported back
+					// as "not rotated at all". Resetting the chip's own writing-mode makes the
+					// transform the only rotation in effect - and also means a rotation direction
+					// (clockwise vs counter-clockwise) sanity-checked against an *isolated* element
+					// with no inherited vertical-rl doesn't actually predict the right sign here:
+					// that same inherited writing-mode that caused the "not rotated at all" bug
+					// also flips which transform sign visually matches the real (inherited-
+					// vertical-rl) text next to it. Only measuring actual character positions in
+					// this exact context - both the real device-info text and the chip's own label
+					// - settled it: rotate(90deg) is what actually matches, confirmed by
+					// Range.getBoundingClientRect() on each character showing the same
+					// top-to-bottom reading order in both, not by re-deriving it from first
+					// principles (which gave the wrong sign here once already).
 					if($disk_tray_direction == "v") {
 						$drive_type_icon_start_style = "flex-shrink: 0;";
 						$drive_type_icon_column_style = "flex: 1 1 0; min-height: 0; overflow-wrap: break-word; position: relative;";
-						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 6px; left: 0; writing-mode: horizontal-tb; transform: rotate(-90deg);\">$drive_type_icon</span>";
+						$drive_type_icon_middle_html = "<span style=\"position: absolute; bottom: 6px; left: 0; writing-mode: horizontal-tb; transform: rotate(90deg);\">$drive_type_icon</span>";
 					}
 					else {
 						$drive_type_icon_start_style = "";
