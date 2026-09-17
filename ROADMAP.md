@@ -51,13 +51,27 @@ Once Phase 1 is done:
   whatever comes next in Phase 3 - including anyone on Unraid versions older than 7.2,
   which can't run the plugin architecture Phase 3 depends on at all.
 
-## Phase 3: Rewrite on NestJS/TypeScript/Node.js (native Unraid API plugin)
+## Phase 3: Rewrite on Unraid's native API (moved to its own repo)
 
-Starting with Unraid 7.2, Unraid ships a built-in GraphQL API (`unraid-api`) with a real
-plugin architecture: plugins can register their own GraphQL resolvers, background jobs,
-and WebGUI components, on NestJS/TypeScript/Node.js, with API keys/session
-cookies/SSO-OIDC auth already built in. That's the modern, sanctioned way to integrate
-deeply with Unraid going forward.
+**Status (2026-09-16): scoped, and moved to a separate codebase —
+[joshmans/unraid-disklocation-next](https://github.com/joshmans/unraid-disklocation-next).** That repo's
+own ROADMAP.md has the full architecture writeup; summary below.
+
+Starting with Unraid 7.2, Unraid ships a built-in GraphQL API (`unraid-api`) with API
+keys/session cookies/SSO-OIDC auth already built in. The original framing here assumed
+third-party plugins can also register their own GraphQL resolvers and WebGUI components
+directly into that process, the way classic `.plg`/`.page` plugins hook into the PHP
+webGUI. Scoping turned up no documented contract for that as of 2026-09: Unraid's own
+roadmap lists "Developer Tools for Plugins" as a still-unshipped Q2 2025 target, and every
+real third-party `unraid-api` integration found in the wild is an external client
+authenticating with an API key, not an in-process extension. So Phase 3 is proceeding as a
+standalone TypeScript/Node.js service that reads Unraid state over GraphQL, rather than
+betting on plugin extensibility that doesn't appear to exist yet - revisit if Unraid ships
+a real third-party plugin SDK.
+
+It's a clean-room rewrite with no shared code or history with this repo - only the
+tray-map/SMART-history ideas carry over. It got its own repo rather than living alongside
+this one, given that clean break and the different tech stack.
 
 **REST/JSON status endpoint (moved here from Phase 1):** we scoped and partly built this
 as a single-static-token PHP endpoint for tools like Home Assistant, Grafana, or Homepage
@@ -79,21 +93,11 @@ This would also obsolete the need for that custom token entirely - consumers cou
 Disk Location's data straight through Unraid's own GraphQL surface, using auth Unraid
 already provides.
 
-This is a different technology stack from the rest of this codebase, not just a new
-file in the existing one, so it's being scoped as its own project rather than folded
-into ongoing PHP work. Requires Unraid 7.2+, so it won't replace the PHP version for
-everyone immediately - both will coexist for a transition period, hence Phase 2.
+Requires Unraid 7.2+, so it won't replace the PHP version for everyone immediately - both
+will coexist for a transition period, hence Phase 2.
 
-Open questions to work through before writing code, rather than deciding blind:
-
-- Full rewrite vs. gradual migration - e.g. start by wrapping the existing PHP
-  config-reading logic behind a new GraphQL resolver, rather than reimplementing
-  everything on day one
-- How much of the tray-map/visual UI can carry over conceptually vs. needs to be
-  rebuilt as native WebGUI components in the new framework
-- Minimum supported Unraid version for the rewrite (7.2, or a later version once the
-  plugin architecture has had more time to mature)
-- Repo structure: same repo with both codebases side by side, or a separate
-  repo/package for the rewrite
-
-This phase doesn't have a start date yet - it begins once Phase 1 is done.
+Remaining open questions (distribution mechanism, UI delivery, SMART-history storage, how
+much of the tray-map UI carries over) now live in
+[unraid-disklocation-next's ROADMAP.md](https://github.com/joshmans/unraid-disklocation-next/blob/master/ROADMAP.md)
+rather than here, alongside the settled ones (full rewrite, no gradual migration; 7.2+
+minimum; separate repo).
