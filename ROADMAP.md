@@ -98,6 +98,6 @@ will coexist for a transition period, hence Phase 2.
 
 Remaining open questions (distribution mechanism, UI delivery, SMART-history storage, how
 much of the tray-map UI carries over) now live in
-[unraid-disklocation-next's ROADMAP.md](https://github.com/joshmans/unraid-disklocation-next/blob/master/ROADMAP.md)
+[unraid-disklocation-next's ROADMAP.md](https://github.com/joshmans/unraid-disklocation-next/blob/main/ROADMAP.md)
 rather than here, alongside the settled ones (full rewrite, no gradual migration; 7.2+
 minimum; separate repo).
