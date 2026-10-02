@@ -97,7 +97,7 @@
 	
 	foreach($raw_devices as $key => $data) {
 		if($data["hash"]) {
-			$status = ( !$data["status"] ? 'a' : $data["status"] );
+			$status = ( !$data["status"] || $data["status"] == "c" ? 'a' : $data["status"] );
 			$allocated = ( ($status != "a") ? "unallocated" : "allocated" );
 			$hash = $data["hash"];
 			
@@ -169,6 +169,7 @@
 				</td>
 				<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px; text-align: center;\"><input type=\"button\" class=\"diskLocation\" style=\"background-color: #F2F2F2; transform: none;\" onclick=\"locateStart()\" value=\"Locate\" id=\"" . $data["device"] . "\" name=\"" . $allocated . "\" /></td>
 				<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px; text-align: center;\"><input " . (!empty($get_physical[$phyloc_array[$raw["node"]]]) ? "checked=\"checked\"" : "") . " " . (empty($phyloc_array[$raw["node"]]) ? "disabled=\"disabled\"" : "") . " type=\"checkbox\" value=\"" . $raw["node"] . "\" name=\"physical[" . $hash . "]\" /></td>
+				<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px; text-align: center;\"><input " . ($raw["status"] == "c" ? "checked=\"checked\"" : "") . " type=\"checkbox\" value=\"c\" name=\"status[" . $hash . "]\" /></td>
 				
 			";
 			
@@ -390,6 +391,7 @@
 						<td style="width: 0; padding: 0 10px 0 10px;"><b>#</b></td>
 						<td style="width: 0; padding: 0 10px 0 10px;"><b>Locate</b></td>
 						<td style="width: 0; padding: 0 10px 0 10px;"><b>Physical</b></td>
+						<td style="width: 0; padding: 0 10px 0 10px;"><b>Cold</b></td>
 						<?php print($table_trayalloc_order_name_html); ?>
 						<td style="width: 0; padding: 0 10px 0 10px;"><b>Custom Color</b></td>
 					</tr>
@@ -413,6 +415,7 @@
 										<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px;\"><b>#</b></td>
 										<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px;\"><b>Locate</b></td>
 										<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px;\"><b>Physical</b></td>
+										<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px;\"><b>Cold</b></td>
 										$table_trayalloc_order_name_html
 										<td style=\"width: 0; white-space: nowrap; padding: 0 10px 0 10px;\"><b>Custom Color</b></td>
 									</tr>
@@ -439,6 +442,9 @@
 									</ul>
 									Hot swapping requires execution of Force SMART+DB, and will be prompted within 5 minutes. Inserting devices in powered off mode, will automatically execute it during boot.
 								</dd>
+								
+								<dt>Cold</dt>
+								<dd>Define as a cold storage device, this will store the information about the device and location without the device being attached and online.</dd>
 								
 								<dt>Manufactured, Purchased and Warranty</dt>
 								<dd>For Unraid array drives which already got the date set, this will be detected automatically and used. You can use this plugin to enter all the dates in bulk if the "Allow editing of Unraid config" is set to "Yes" under Configuration.</dd>
